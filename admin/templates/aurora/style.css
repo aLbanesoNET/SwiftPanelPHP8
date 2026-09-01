@@ -484,14 +484,12 @@ table.data[style*="12px"]::before, table.data[style*="height:12"]::before { disp
 
 img.greenbar, img.redbar, img.goldbar { display: none; }
 
-/* legacy multi-column layout tables: add gutters + top-align so side-by-side
-   cards (dashboard, two-column summaries) don't butt together */
-#content > table[border="0"] > tbody > tr > td,
-#content > form > table[border="0"] > tbody > tr > td { padding: 0 9px; vertical-align: top; }
-#content > table[border="0"] > tbody > tr > td:first-child,
-#content > form > table[border="0"] > tbody > tr > td:first-child { padding-left: 0; }
-#content > table[border="0"] > tbody > tr > td:last-child,
-#content > form > table[border="0"] > tbody > tr > td:last-child { padding-right: 0; }
+/* legacy multi-column layout cells (dashboard, two-column summaries) — scoped
+   to % widths so tab bars and other legacy tables are untouched; border-box
+   keeps the gutter inside the declared column width */
+#content table[border="0"] > tbody > tr > td[width$="%"] { box-sizing: border-box; padding: 0 9px; vertical-align: top; }
+#content table[border="0"] > tbody > tr > td[width$="%"]:first-child { padding-left: 0; }
+#content table[border="0"] > tbody > tr > td[width$="%"]:last-child { padding-right: 0; }
 
 /* ---- Legacy field grid ---------------------------------------- */
 

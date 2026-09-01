@@ -3,9 +3,40 @@
 A game-server control panel (client area + admin back office), originally written for
 PHP 5 / MySQL 5.0 in 2009 and modernised to run on **PHP 8** with `mysqli`.
 
-- Passwords are hashed with bcrypt (legacy SHA1/plain-text accounts upgrade on next login).
-- Runs cleanly on PHP 8.0–8.4, MySQL 5.7+ / MariaDB 10.3+.
-- Ships with two themes (`default`, `aurora`); switch under **Configuration → General Settings**.
+- Client, game-server, box (node) and reseller-style client management
+- Web SSH console + read-only file browser for every box, live system stats
+- Passwords hashed with bcrypt (legacy SHA1/plain-text accounts upgrade on next login)
+- Runs cleanly on PHP 8.0–8.4, MySQL 5.7+ / MariaDB 10.3+
+- Three bundled themes — switch under **Configuration → General Settings**
+
+---
+
+## Screenshots
+
+> The **Aurora** theme (dark). A **Bootstrap** and the classic **Default** theme also ship.
+
+### Admin
+
+| | |
+|---|---|
+| **Dashboard** — clients / servers / boxes at a glance, live activity feed | **Game servers** — status, ownership, start / stop / restart |
+| [![Dashboard](docs/screenshots/admin-dashboard.png)](docs/screenshots/admin-dashboard.png) | [![Servers](docs/screenshots/admin-servers.png)](docs/screenshots/admin-servers.png) |
+| **Boxes** — SSH / FTP reachability, CPU load & idle from cron | **Manage games** — per-game defaults, executables, query protocol |
+| [![Boxes](docs/screenshots/admin-boxes.png)](docs/screenshots/admin-boxes.png) | [![Games](docs/screenshots/admin-games.png)](docs/screenshots/admin-games.png) |
+| **Clients** — searchable, paginated, status-coloured | **Activity log** — every action, immutable, `#id` deep-links |
+| [![Clients](docs/screenshots/admin-clients.png)](docs/screenshots/admin-clients.png) | [![Activity log](docs/screenshots/admin-activity-log.png)](docs/screenshots/admin-activity-log.png) |
+
+**Box summary** — live system information, a read-only SSH file browser, and an
+interactive `screen`-backed console, all on one page:
+
+[![Box summary](docs/screenshots/admin-box-summary.png)](docs/screenshots/admin-box-summary.png)
+
+### Client area
+
+| | |
+|---|---|
+| **Dashboard** | **My servers** |
+| [![Client dashboard](docs/screenshots/client-dashboard.png)](docs/screenshots/client-dashboard.png) | [![Client servers](docs/screenshots/client-servers.png)](docs/screenshots/client-servers.png) |
 
 ---
 
@@ -57,6 +88,19 @@ sudo chown -R www-data:www-data /var/www/html && sudo systemctl restart apache2
 | Client | `/` | created by an admin under *Clients → Add New Client* |
 
 Change the admin password immediately under *My Account*.
+
+---
+
+## Themes
+
+Set the active theme under **Configuration → General Settings → Panel Template**.
+Each theme is a self-contained folder (with a matching one under `admin/templates/`):
+
+| Folder | Look |
+|---|---|
+| `bootstrap` | Bootstrap 5.3 + Bootstrap Icons, light. **Shipped default.** |
+| `aurora` | Dark, collapsible icon rail, glass panels, animated background (light-mode aware). |
+| `default` | The original 2009 look. |
 
 ---
 

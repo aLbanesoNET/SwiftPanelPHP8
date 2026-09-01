@@ -20,6 +20,11 @@
 		<input type="button" value="Start Server"
 		  onclick="window.location='servermanage.php?task=start&amp;serverid=<?= (int)($srv['serverid'] ?? 0) ?>'"
 		  class="button green start" />
+		<?php if (!empty($srv['installdir'])): ?>
+		<input type="button" value="Reinstall Server"
+		  onclick="if (confirm('Reinstall server #<?= (int)($srv['serverid'] ?? 0) ?> - <?= htmlspecialchars(addslashes((string)($srv['name'] ?? '')), ENT_QUOTES) ?>?\n\nEvery file in the server directory will be deleted and replaced with a fresh copy.')) { window.location='serverrebuild.php?task=serverrebuild&amp;serverid=<?= (int)($srv['serverid'] ?? 0) ?>'; }"
+		  class="button blue restart" />
+		<?php endif; ?>
 	  <?php elseif (($srv['online'] ?? '') === 'Started'): ?>
 		<input type="button" value="Restart Server"
 		  onclick="window.location='servermanage.php?task=restart&amp;serverid=<?= (int)($srv['serverid'] ?? 0) ?>'"

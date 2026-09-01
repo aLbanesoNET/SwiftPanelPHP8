@@ -73,6 +73,11 @@ if (!empty($srv["ipid"])) {
 	]);
 }
 
+// Surface a flash set by servermanage.php / serverrebuild.php (they redirect
+// here; include.php has already moved msg1/msg2 into $FLASH_MSG*).
+$e_msg1 = $e_msg1 ?? ($FLASH_MSG1 ?? null);
+$e_msg2 = $e_msg2 ?? ($FLASH_MSG2 ?? null);
+
 include __DIR__ . "/templates/default/header.php";
 include __DIR__ . "/templates/default/serversummary.php";
 include __DIR__ . "/templates/default/footer.php";

@@ -120,7 +120,9 @@
 /* ---- Section headers (href="#") ------------------------------------- */
 
 #nav .dropdown > li.utilities > a,
-#nav .dropdown > li.configuration > a
+#nav .dropdown > li.configuration > a,
+#nav .dropdown > li.utilities > a.current,
+#nav .dropdown > li.configuration > a.current
 {
     height: 0;
     margin: 0 12px;
@@ -130,14 +132,15 @@
     font: 800 9px/1 var(--mono, ui-monospace, monospace);
     letter-spacing: .18em;
     text-transform: uppercase;
-    background: none;
+    background: none !important;
+    box-shadow: none !important;
     pointer-events: none;
     opacity: 0;
     transition: opacity 160ms ease, height 160ms ease, margin 160ms ease;
 }
 
 #nav .dropdown > li.utilities > a::before,
-#nav .dropdown > li.configuration > a::before { display: none; }
+#nav .dropdown > li.configuration > a::before { display: none !important; }
 
 #nav:hover .dropdown > li.utilities > a,
 #nav:hover .dropdown > li.configuration > a,

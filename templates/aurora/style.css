@@ -484,10 +484,10 @@ table.data[style*="12px"]::before { display: none; }
 
 img.greenbar, img.redbar, img.goldbar { display: none; }
 
-/* multi-column layout tables: gutters + top-align */
-#container > table[border="0"] > tbody > tr > td { padding: 0 9px; vertical-align: top; }
-#container > table[border="0"] > tbody > tr > td:first-child { padding-left: 0; }
-#container > table[border="0"] > tbody > tr > td:last-child { padding-right: 0; }
+/* multi-column layout cells — % widths only, border-box gutter */
+#container table[border="0"] > tbody > tr > td[width$="%"] { box-sizing: border-box; padding: 0 9px; vertical-align: top; }
+#container table[border="0"] > tbody > tr > td[width$="%"]:first-child { padding-left: 0; }
+#container table[border="0"] > tbody > tr > td[width$="%"]:last-child { padding-right: 0; }
 
 /* ---- Field grid ------------------------------------------- */
 
