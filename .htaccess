@@ -1,0 +1,17 @@
+# Swift Panel — Apache hardening.
+# (nginx users: replicate these rules in the server block; see DEPLOY.md.)
+
+Options -Indexes
+
+# Never serve the DB credentials, even if PHP is mis-handled.
+<FilesMatch "^(configuration\.php|DEPLOY\.md|.*\.sql|.*\.md)$">
+    Require all denied
+</FilesMatch>
+
+# Back-end includes not meant to be requested directly.
+RedirectMatch 403 ^/includes/
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
