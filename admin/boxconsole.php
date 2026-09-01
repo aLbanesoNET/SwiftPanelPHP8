@@ -29,11 +29,11 @@ if (!$box) {
 }
 
 if (trim($command) !== '') {
-	$msg = "Box console on <a href=\"boxsummary.php?id=" . $boxid . "\">#" . $boxid . "</a>: "
-		. str_replace(["\r", "\n"], '', $command);
+	$logCommand = htmlspecialchars(str_replace(["\r", "\n"], '', $command), ENT_QUOTES, 'UTF-8');
+	$msg = 'Box console on <a href="boxsummary.php?id=' . (int) $boxid . '">#' . (int) $boxid . '</a>: ' . $logCommand;
 	dbExec(
-		"INSERT INTO `log` SET `boxid` = '" . $boxid . "', "
-		. "`message` = '" . sanitizeInput($msg) . "', "
+		"INSERT INTO `log` SET `boxid` = '" . (int) $boxid . "', "
+		. "`message` = '" . dbEscape($msg) . "', "
 		. "`name` = '" . sanitizeInput(($_SESSION['adminfirstname'] ?? '') . ' ' . ($_SESSION['adminlastname'] ?? '')) . "', "
 		. "`ip` = '" . sanitizeInput($_SERVER['REMOTE_ADDR'] ?? '') . "'"
 	);

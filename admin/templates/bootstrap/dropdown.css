@@ -1,0 +1,124 @@
+/* ============================================================================
+   Bootstrap — admin sidebar navigation (replaces the UvumiTools dropdown).
+   header.php does not load dropdown.js, so this is a plain static list:
+   top-level links with Bootstrap-Icons glyphs, sub-items always visible.
+   ========================================================================== */
+
+#nav .dropdown,
+#nav .dropdown ul
+{
+    visibility: visible;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+    gap: .1rem;
+    list-style: none;
+    border: 0;
+}
+
+#nav .dropdown li { margin: 0; padding: 0; float: none; list-style: none; }
+
+#nav .dropdown > li > a,
+#nav .dropdown ul li a
+{
+    position: relative;
+    display: flex;
+    padding: .55rem .7rem;
+    align-items: center;
+    gap: .7rem;
+    border: 0;
+    border-radius: .5rem;
+    background: transparent;
+    color: var(--bs-secondary-color, #5c6470);
+    font: 500 .9rem/1.4 var(--bs-font-sans-serif, system-ui, sans-serif);
+    text-decoration: none;
+    transition: background .12s ease, color .12s ease;
+}
+
+#nav .dropdown > li > a::before
+{
+    width: 1.15rem;
+    flex: 0 0 1.15rem;
+    font-family: "bootstrap-icons";
+    font-size: 1rem;
+    text-align: center;
+    color: var(--bs-secondary-color, #8a929e);
+    transition: color .12s ease;
+}
+
+#nav .dropdown > li > a:hover,
+#nav .dropdown ul li a:hover
+{
+    background: var(--bs-tertiary-bg, #f2f4f7);
+    color: var(--bs-body-color, #212529);
+    text-decoration: none;
+}
+
+#nav .dropdown > li > a:hover::before { color: var(--bs-primary, #0d6efd); }
+
+#nav .dropdown > li > a.current
+{
+    background: var(--bs-primary, #0d6efd);
+    color: #fff;
+}
+
+#nav .dropdown > li > a.current::before { color: #fff; }
+
+/* Section headers (href="#") */
+#nav .dropdown > li.utilities > a,
+#nav .dropdown > li.configuration > a
+{
+    margin: .9rem .3rem .1rem;
+    padding: 0;
+    color: var(--bs-tertiary-color, #9aa2ad) !important;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    background: none !important;
+    pointer-events: none;
+}
+
+#nav .dropdown > li.utilities > a::before,
+#nav .dropdown > li.configuration > a::before { display: none; }
+
+/* Sub-item lists — always shown, indented */
+#nav .dropdown li ul
+{
+    display: flex !important;
+    position: static !important;
+    visibility: visible !important;
+    height: auto !important;
+    margin: .1rem 0 .35rem .55rem !important;
+    padding: 0 0 0 .4rem !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    border-left: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+#nav .dropdown li ul li a { padding-left: .8rem; font-size: .85rem; }
+
+#nav .dropdown li ul li a::before
+{
+    width: .35rem;
+    flex: 0 0 .35rem;
+    height: .35rem;
+    border-radius: 50%;
+    background: var(--bs-tertiary-color, #adb5bd);
+    content: "";
+}
+
+#nav .dropdown li ul li a:hover::before,
+#nav .dropdown li ul li a.current::before { background: var(--bs-primary, #0d6efd); }
+#nav .dropdown ul li a.current { color: var(--bs-body-color, #212529); font-weight: 600; }
+
+/* Icons */
+#nav .dropdown li.clients > a::before       { content: "\f4d0"; } /* people */
+#nav .dropdown li.servers > a::before       { content: "\f52c"; } /* server */
+#nav .dropdown li.boxes > a::before         { content: "\f411"; } /* hdd-stack */
+#nav .dropdown li.account > a::before       { content: "\f4d7"; } /* person-circle */
+#nav .dropdown li.logout > a::before        { content: "\f1c3"; } /* box-arrow-right */
+
+#nav .dropdown li.logout > a:hover { background: var(--bs-danger-bg-subtle, #f8d7da); color: var(--bs-danger, #dc3545); }
+#nav .dropdown li.logout > a:hover::before { color: var(--bs-danger, #dc3545); }

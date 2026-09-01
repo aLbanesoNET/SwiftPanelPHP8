@@ -37,7 +37,16 @@ $panelName = dbRow(
 );
 
 define('SITENAME', $panelName['value'] ?? 'Swift Panel');
-define('TEMPLATE', 'default');
+
+// Active template — read from the `template` config row (set on the admin
+// General Settings page). Sanitised to a folder name and checked to exist;
+// falls back to 'default' if unset or invalid.
+$templateRow  = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'template' LIMIT 1", true);
+$templateName = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($templateRow['value'] ?? ''));
+if ($templateName === '' || !is_dir(__DIR__ . '/templates/' . $templateName)) {
+	$templateName = 'default';
+}
+define('TEMPLATE', $templateName);
 
 $SITE_NAME  = SITENAME;
 $SITE_TITLE = $title !== '' ? $title . ' - ' . SITENAME : SITENAME;

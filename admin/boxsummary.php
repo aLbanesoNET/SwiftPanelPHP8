@@ -159,6 +159,12 @@ renderTabs($tabs, 1);
 				</tr>
 			  </table>
 			</form>
+			</fieldset>
+			<fieldset>
+			<table width="100%" border="0" cellpadding="2" cellspacing="2">
+			  <tr><td class="fieldheader">File Browser <font color="#666666" size="-2">(read only)</font></td></tr>
+			  <tr><td><div id="boxFbArea" style="font-size:11px;">Loading&hellip;</div></td></tr>
+			</table>
 			</fieldset></td>
 		</tr>
 		<tr>
@@ -259,6 +265,24 @@ renderTabs($tabs, 1);
 		window.swConsoleRefresh=function(){ send(''); };
 		setInterval(function(){ if(auto&&auto.checked&&!busy){ send(''); } },5000);
 		send('');
+	  })();
+	  </script>
+	  <script type="text/javascript">
+	  (function(){
+		var BID=<?= (int)$rows["boxid"] ?>, area=document.getElementById('boxFbArea'), fbBusy=false;
+		function fbLoad(url){
+		  if(fbBusy){return;} fbBusy=true; area.innerHTML='Loading&hellip;';
+		  var x=new XMLHttpRequest();
+		  x.open('GET',url,true);
+		  x.onreadystatechange=function(){
+			if(x.readyState!==4){return;} fbBusy=false;
+			area.innerHTML=(x.status===200 && x.responseText) ? x.responseText : '<div id="infobox2">File browser unavailable.</div>';
+		  };
+		  x.send();
+		}
+		window.boxFbNav=function(p){ fbLoad('boxfiles.php?id='+BID+'&path='+encodeURIComponent(p)); return false; };
+		window.boxFbView=function(p,f){ fbLoad('boxfiles.php?id='+BID+'&path='+encodeURIComponent(p)+'&view='+encodeURIComponent(f)); return false; };
+		boxFbNav('/home');
 	  })();
 	  </script>
 	  <script language="javascript" type="text/javascript">

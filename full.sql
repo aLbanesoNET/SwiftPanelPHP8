@@ -120,7 +120,7 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('systemurl', 'http://www.example.com/'),
 ('key', ''),
 ('panelversion', '1.6.1'),
-('template', 'default'),
+('template', 'bootstrap'),
 ('country', 'US');
 
 -- --------------------------------------------------------
@@ -310,3 +310,19 @@ CREATE TABLE IF NOT EXISTS `server` (
 --
 -- Dumping data for table `server`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Repair activity-log rows written by an older build that HTML-escaped the
+-- whole console-log message (the "#N" link showed as raw text). No-op on a
+-- fresh database. Safe to re-run.
+--
+
+UPDATE `log` SET `message` =
+  REPLACE(REPLACE(REPLACE(REPLACE(`message`,
+    '&lt;a href=', '<a href='),
+    '"&gt;&#35;', '">#'),
+    '&lt;/a&gt;', '</a>'),
+    '&#35;', '#')
+WHERE `message` LIKE '%onsole %&lt;a href=%';

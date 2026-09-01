@@ -46,4 +46,13 @@ if($panelversion["value"] != "1.6.1") {
 $panelname = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'panelname' LIMIT 1", TRUE);
 define("VERSION", $panelversion["value"]);
 define("SITENAME", $panelname["value"]);
-define("TEMPLATE", "default");
+
+// Active template — read from the `template` config row (admin General
+// Settings). Sanitised to a folder name and checked to exist; 'default' if
+// unset or invalid.
+$templateRow  = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'template' LIMIT 1", TRUE);
+$templateName = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($templateRow["value"] ?? ''));
+if ($templateName === "" || !is_dir(__DIR__ . "/templates/" . $templateName)) {
+	$templateName = "default";
+}
+define("TEMPLATE", $templateName);

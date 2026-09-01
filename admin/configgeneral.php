@@ -26,6 +26,16 @@ $vPanelname = $_SESSION["panelname"] ?? ""; unset($_SESSION["panelname"]);
 $vSystemurl = $_SESSION["systemurl"] ?? ""; unset($_SESSION["systemurl"]);
 $vTemplate  = $_SESSION["template"] ?? "";  unset($_SESSION["template"]);
 $vCountry   = $_SESSION["country"] ?? "";
+
+// Templates the panel can actually use need a folder in BOTH templates/ and
+// admin/templates/ — offer the intersection as a dropdown.
+$frontendTemplates = array_map("basename", array_filter((array) glob(__DIR__ . "/../templates/*"), "is_dir"));
+$adminTemplates    = array_map("basename", array_filter((array) glob(__DIR__ . "/templates/*"), "is_dir"));
+$templateChoices   = array_values(array_intersect($frontendTemplates, $adminTemplates));
+sort($templateChoices);
+if ($vTemplate !== "" && !in_array($vTemplate, $templateChoices, true)) {
+	$templateChoices[] = $vTemplate;
+}
 include "./templates/" . TEMPLATE . "/header.php";
 echo renderMessageBox();
 ?>
@@ -56,8 +66,12 @@ echo renderMessageBox();
 		  </tr>
 		  <tr>
 			<td class="fieldname">Panel Template</td>
-			<td class="fieldarea"><input type="text" name="template" class="text" size="15" value="<?= $vTemplate ?>" /><br />
-			  <font color="#222222" size="-2">Name of the folder in templates</font></td>
+			<td class="fieldarea"><select name="template" class="select">
+			  <?php foreach ($templateChoices as $choice): ?>
+			  <option value="<?= htmlspecialchars($choice) ?>"<?= $choice === $vTemplate ? ' selected="selected"' : '' ?>><?= htmlspecialchars(ucfirst($choice)) ?></option>
+			  <?php endforeach; ?>
+			  </select><br />
+			  <font color="#222222" size="-2">Theme folder under <code>templates/</code> — applies to the client area and admin</font></td>
 		  </tr>
 		  </table>
 		</fieldset></td>

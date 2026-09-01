@@ -33,11 +33,12 @@ $box = dbRow(
 	true
 );
 
-$message = "Console command on <a href=\"serversummary.php?id=" . (int) $serverid . "\">#" . (int) $serverid . "</a>: " . str_replace(["\r", "\n"], '', $command);
+$logCommand = htmlspecialchars(str_replace(["\r", "\n"], '', $command), ENT_QUOTES, 'UTF-8');
+$message = 'Console command on <a href="serversummary.php?id=' . (int) $serverid . '">#' . (int) $serverid . '</a>: ' . $logCommand;
 if (trim($command) !== '') {
 	dbExec(
 		"INSERT INTO `log` SET `serverid` = '" . (int) $serverid . "', "
-		. "`message` = '" . sanitizeInput($message) . "', "
+		. "`message` = '" . dbEscape($message) . "', "
 		. "`name` = '" . sanitizeInput(($_SESSION['adminfirstname'] ?? '') . ' ' . ($_SESSION['adminlastname'] ?? '')) . "', "
 		. "`ip` = '" . sanitizeInput($_SERVER['REMOTE_ADDR'] ?? '') . "'"
 	);

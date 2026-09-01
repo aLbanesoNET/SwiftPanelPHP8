@@ -17,6 +17,20 @@ function sanitizeInput(string $data): string
 	return $data;
 }
 
+/**
+ * SQL-escape only — no HTML entity encoding. For values that are already
+ * display-safe (e.g. a log message built from cast integers + a
+ * htmlspecialchars()'d command) and must keep their markup intact.
+ */
+function dbEscape(string $data): string
+{
+	global $connection;
+
+	return $connection instanceof mysqli
+		? mysqli_real_escape_string($connection, $data)
+		: addslashes($data);
+}
+
 /*
  * Password handling.
  *

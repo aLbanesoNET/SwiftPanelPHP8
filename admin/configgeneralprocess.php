@@ -10,7 +10,7 @@ switch ($task) {
 	case "generaledit":
 		$panelname = sanitizeInput($_POST["panelname"] ?? "");
 		$systemurl = sanitizeInput($_POST["systemurl"] ?? "");
-		$template = sanitizeInput($_POST["template"] ?? "");
+		$template = preg_replace('/[^A-Za-z0-9_-]/', '', sanitizeInput($_POST["template"] ?? ""));
 		$country = sanitizeInput($_POST["country"] ?? "");
 		unset($_SESSION["msg1"]);
 		unset($_SESSION["msg2"]);
