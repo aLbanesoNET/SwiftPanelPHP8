@@ -25,10 +25,10 @@ sudo apt update && sudo apt install -y apache2 mariadb-server php libapache2-mod
 sudo mysql -e "CREATE DATABASE swiftpanel CHARACTER SET utf8mb4; CREATE USER 'swift'@'localhost' IDENTIFIED BY 'CHANGE_THIS'; GRANT ALL ON swiftpanel.* TO 'swift'@'localhost'; FLUSH PRIVILEGES;"
 ```
 
-**3 — Put the files in the web root** (upload `swiftpanel-php8.tar.gz` first, e.g. `scp swiftpanel-php8.tar.gz you@vps:~`):
+**3 — Put the files in the web root:**
 
 ```bash
-sudo mkdir -p /var/www/html && sudo tar -xzf ~/swiftpanel-php8.tar.gz -C /var/www/html --strip-components=1 && sudo rm -f /var/www/html/index.html
+sudo mkdir -p /var/www/html && sudo unzip ~/SwiftPanelPHP8-master.zip -C /var/www/html && sudo rm -f /var/www/html/index.html
 ```
 
 **4 — Enter your DB password** into `configuration.php`:
@@ -40,7 +40,7 @@ sudo nano /var/www/html/configuration.php
 **5 — Import the schema** (strict SQL mode is relaxed for the import only — the 2009 seed data needs it):
 
 ```bash
-sudo mysql swiftpanel --init-command="SET SESSION sql_mode=''" < /var/www/html/install/updates/full.sql
+sudo mysql swiftpanel --init-command="SET SESSION sql_mode=''" < /var/www/html/full.sql
 ```
 
 **6 — Fix ownership, delete the installer, restart:**
@@ -53,29 +53,6 @@ Then open **`http://YOUR-VPS-IP/admin/`** — login `admin` / `password`. Change
 under *My Account*. The client area is at `http://YOUR-VPS-IP/`.
 
 ---
-
-## Upgrading an existing 1.6.1 database
-
-Instead of step 5, import the migration (adds a missing column) on top of your current data:
-
-```bash
-sudo mysql swiftpanel --init-command="SET SESSION sql_mode=''" < /var/www/html/install/updates/upgrade-php8.sql
-```
-
-## After it's running
-
-- **Server monitoring / start-stop** needs the cron job — set it up under
-  *Configuration → Cron Settings* (it runs `admin/cron.php`; needs `php-ssh2`, already installed).
-- **HTTPS:**
-
-  ```bash
-  sudo apt install -y certbot python3-certbot-apache && sudo certbot --apache
-  ```
-
-- **FTP** — the panel is an FTP *client*; each game-server box needs its own FTP server
-  (`sudo apt install -y vsftpd`). See DEPLOY.md.
-- Older distro (Ubuntu 20.04 = PHP 7.4)? Add `sudo add-apt-repository ppa:ondrej/php` and
-  install `php8.3` before step 1.
 
 ## Default logins
 
