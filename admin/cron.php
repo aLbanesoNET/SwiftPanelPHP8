@@ -39,24 +39,16 @@ if(extension_loaded("ssh2")) {
 	dbFreeResult($result);
 }
 if(extension_loaded("ssh2")) {
+	require_once $path . "includes/boxctl.php";
 	$result = dbQuery("SELECT `boxid`, `ip`, `login`, `password`, `ssh`, `sshport` FROM `box` ORDER BY `boxid`");
 	while ($rows = dbFetch($result)) {
 		$load = "~";
 		$idle = "~";
-		if($rows["ssh"] == "Online" && ($sshconnection = @ssh2_connect($rows["ip"], $rows["sshport"])) && @ssh2_auth_password($sshconnection, $rows["login"], @base64_decode($rows["password"]))) {
-			$sshshell = @ssh2_shell($sshconnection, "vt102", null, 400, 80, SSH2_TERM_UNIT_CHARS);
-			@fwrite($sshshell, "top -bi -d .5 -n 2\n");
-			sleep(3);
-			while ($sshline = fgets($sshshell)) {
-				if(preg_match("/load average:/", $sshline)) {
-					list($garbage, $garbage, $garbage, $garbage, $load, $garbage) = explode(",", $sshline, 6);
-					$load = trim($load);
-				}
-				if(preg_match("/Cpu\\(s\\):/", $sshline)) {
-					list($garbage, $garbage, $garbage, $idle, $garbage) = explode(",", $sshline, 5);
-					$idle = trim($idle, "id");
-					$idle = trim($idle);
-				}
+		if($rows["ssh"] == "Online") {
+			$s = getBoxStats($rows);
+			if(!empty($s["ok"])) {
+				$load = ($s["load"] ?? "") !== "" ? explode(" ", trim($s["load"]))[0] : "~";
+				$idle = ($s["idle"] ?? "") !== "" ? $s["idle"] . "%" : "~";
 			}
 		}
 		dbExec("UPDATE `box` SET `load` = '" . $load . "', `idle` = '" . $idle . "' WHERE `boxid` = '" . $rows["boxid"] . "'");

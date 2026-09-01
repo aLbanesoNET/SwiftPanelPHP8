@@ -179,6 +179,59 @@ renderTabs($tabs, 1);
 			</fieldset></td>
 		</tr>
 	  </table>
+	  <?php if(!empty($rows["ipid"])):
+		$cOnline = ($rows["online"] === "Started"); ?>
+	  <fieldset>
+		<table width="100%" border="0" cellpadding="2" cellspacing="2">
+		  <tr><td class="fieldheader">Console</td></tr>
+		  <tr><td>
+			<pre id="swConsoleOut" class="swconsole">Connecting&hellip;</pre>
+			<form onsubmit="return swConsoleSend();" style="margin:6px 0 0;">
+			  <input type="text" id="swConsoleCmd" class="text" style="width:74%;" autocomplete="off" placeholder="command, e.g. status" <?= $cOnline ? '' : 'disabled="disabled"' ?> />
+			  <input type="submit" value="Send" class="button" <?= $cOnline ? '' : 'disabled="disabled"' ?> />
+			  <input type="button" value="Refresh" class="button" onclick="swConsoleRefresh()" />
+			  <label style="font-size:11px;"><input type="checkbox" id="swConsoleAuto" /> Auto</label>
+			</form>
+		  </td></tr>
+		</table>
+	  </fieldset>
+	  <style type="text/css">
+	  .swconsole{background:#0b0b0b;color:#3ad33a;font:11px/1.45 "DejaVu Sans Mono",Consolas,"Courier New",monospace;height:280px;overflow:auto;padding:8px;margin:0;white-space:pre-wrap;word-break:break-all;border:1px solid #333;}
+	  </style>
+	  <script type="text/javascript">
+	  (function(){
+		var SID=<?= (int)$rows["serverid"] ?>, EP="serverconsole.php";
+		var out=document.getElementById('swConsoleOut'),
+			inp=document.getElementById('swConsoleCmd'),
+			auto=document.getElementById('swConsoleAuto'),
+			busy=false;
+		// The admin theme loads an old MooTools that replaces window.JSON with
+		// one that only has decode()/encode() — fall back to it.
+		function parseJSON(s){
+		  if(window.JSON&&typeof JSON.parse==='function')return JSON.parse(s);
+		  if(window.JSON&&typeof JSON.decode==='function')return JSON.decode(s);
+		  return eval('('+s+')');
+		}
+		function send(cmd){
+		  if(busy){return;} busy=true;
+		  var x=new XMLHttpRequest();
+		  x.open('POST',EP,true);
+		  x.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		  x.onreadystatechange=function(){
+			if(x.readyState!==4){return;} busy=false;
+			var r; try{r=parseJSON(x.responseText);}catch(e){out.textContent='Console error: unexpected response.';return;}
+			if(!r.ok){out.textContent=r.error||'Console error.';return;}
+			out.textContent=r.output; out.scrollTop=out.scrollHeight;
+		  };
+		  x.send('id='+SID+'&command='+encodeURIComponent(cmd||''));
+		}
+		window.swConsoleSend=function(){ var c=inp.value; inp.value=''; send(c); if(c){ setTimeout(function(){ if(!busy){ send(''); } },2500); } return false; };
+		window.swConsoleRefresh=function(){ send(''); };
+		setInterval(function(){ if(auto&&auto.checked&&!busy){ send(''); } },5000);
+		send('');
+	  })();
+	  </script>
+	  <?php endif; ?>
 	  <script language="javascript" type="text/javascript">
 	  <!--
 	  function rebuildServer() { if (confirm("Are you sure you want to rebuild server: <?= $rows["name"] ?>?\n\nAll files will be deleted from directory: <?= $rows["homedir"] ?>")) { window.location="serverprocess.php?task=serverrebuild&serverid=<?= $rows["serverid"] ?>"; } }

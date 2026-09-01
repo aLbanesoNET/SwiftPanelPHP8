@@ -4,14 +4,11 @@ A game-server control panel (client area + admin back office), originally writte
 PHP 5 / MySQL 5.0 in 2009 and modernised to run on **PHP 8** with `mysqli`.
 
 - Passwords are hashed with bcrypt (legacy SHA1/plain-text accounts upgrade on next login).
-- Live server query (Real Time Query) works for GoldSrc/Source games (CS 1.6, CS:S, TF2, …).
 - Runs cleanly on PHP 8.0–8.4, MySQL 5.7+ / MariaDB 10.3+.
-
-Full details, nginx config, and the design notes are in [DEPLOY.md](DEPLOY.md).
 
 ---
 
-## Quick start (Debian 12/13 or Ubuntu 22.04+ VPS)
+## Quick start
 
 **1 — Install the stack** (Apache + MariaDB + PHP + extensions, enable `.htaccess`, start services):
 
@@ -48,9 +45,6 @@ sudo mysql swiftpanel --init-command="SET SESSION sql_mode=''" < /var/www/html/f
 ```bash
 sudo chown -R www-data:www-data /var/www/html && sudo rm -rf /var/www/html/install && sudo systemctl restart apache2
 ```
-
-Then open **`http://YOUR-VPS-IP/admin/`** — login `admin` / `password`. Change it immediately
-under *My Account*. The client area is at `http://YOUR-VPS-IP/`.
 
 ---
 

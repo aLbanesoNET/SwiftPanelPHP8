@@ -5,6 +5,7 @@ $return = true;
 
 require __DIR__ . "/configuration.php";
 require __DIR__ . "/include.php";
+require __DIR__ . "/includes/screenctl.php";
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
 	session_start();
@@ -101,23 +102,10 @@ switch ($task) {
 			exit;
 		}
 
-		$shell = @ssh2_shell($ssh, "vt102", null, 400, 80, SSH2_TERM_UNIT_CHARS);
-		if (!$shell) {
-			$_SESSION["msg1"] = "Shell Error!";
-			$_SESSION["msg2"] = "Unable to open SSH shell.";
-			header("Location: serversummary.php?id=" . urlencode($serverid));
-			exit;
-		}
-
-		// Kill screen session for this server safely
-		$sessionName = ($rows["serverid"] ?? "") . "-" . ($rows["user"] ?? "");
-		$sessionNameEsc = str_replace('"', '\"', $sessionName);
-
-		fwrite($shell, "kill -9 \$(screen -list | grep \"" . $sessionNameEsc . "\" | awk '{print \\$1}' | cut -d . -f1)\n");
-		sleep(2);
-		fwrite($shell, "screen -wipe\n");
-		sleep(2);
-		fclose($shell);
+		// Kill every screen session for this server. On a full stop also sweep
+		// anything the server left running; on a restart don't (start follows).
+		$sessionName = screenSessionName($rows["serverid"] ?? "", $rows["user"] ?? "");
+		sshExec($ssh, screenKillCommand($sessionName, $task === "stop" ? (string) ($rows["user"] ?? "") : ""));
 
 		dbExec("UPDATE `server` SET `online` = 'Stopped' WHERE `serverid` = '" . $serverid . "'");
 
@@ -218,36 +206,16 @@ switch ($task) {
 		$serverIp = $rows1["ip"] ?? "";
 		$startline = buildStartCommand($rows, $serverIp);
 
-		$shell = @ssh2_shell($ssh, "vt102", null, 400, 80, SSH2_TERM_UNIT_CHARS);
-		if (!$shell) {
-			$_SESSION["msg1"] = "Shell Error!";
-			$_SESSION["msg2"] = "Unable to open SSH shell.";
+		// Clear any old session, then start fresh in one detached screen.
+		$sessionName = screenSessionName($rows["serverid"] ?? "", $rows["user"] ?? "");
+		$result = sshExec($ssh, screenStartCommand($sessionName, $startline));
+
+		if (preg_match("/not the owner of/i", $result)) {
+			$_SESSION["msg1"] = "Session Permission Error!";
+			$_SESSION["msg2"] = "Delete /run/screen/S-" . ($rows["user"] ?? "") . " on the box to fix this.";
 			header("Location: serversummary.php?id=" . urlencode($serverid));
 			exit;
 		}
-
-		$sessionName = ($rows["serverid"] ?? "") . "-" . ($rows["user"] ?? "");
-		fwrite($shell, "screen -A -m -S " . $sessionName . "\n");
-		sleep(2);
-
-		// Optional: detect "not the owner of" errors, but don't block forever
-		stream_set_timeout($shell, 1);
-		$startTime = time();
-		while (!feof($shell) && (time() - $startTime) < 2) {
-			$line = fgets($shell);
-			if ($line === false) break;
-			if (preg_match("/not the owner of/i", $line)) {
-				$_SESSION["msg1"] = "Session Permission Error!";
-				$_SESSION["msg2"] = "Please notify your administrator of this problem.";
-				fclose($shell);
-				header("Location: serversummary.php?id=" . urlencode($serverid));
-				exit;
-			}
-		}
-
-		fwrite($shell, $startline . "\n");
-		sleep(3);
-		fclose($shell);
 
 		dbExec("UPDATE `server` SET `online` = 'Started' WHERE `serverid` = '" . ($rows["serverid"] ?? $serverid) . "'");
 

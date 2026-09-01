@@ -144,8 +144,8 @@ echo renderMessageBox();
 		  <td align="center"><b><u>Idle</u></b></td>
 		</tr>
 		<tr>
-		  <td align="center"><?= $rows["load"] ?></td>
-		  <td align="center"><?= $rows["idle"] ?></td>
+		  <td align="center"><?= ($rows["load"] === "" || $rows["load"] === "~") ? "&mdash;" : htmlspecialchars($rows["load"]) ?></td>
+		  <td align="center"><?= ($rows["idle"] === "" || $rows["idle"] === "~") ? "&mdash;" : htmlspecialchars($rows["idle"]) ?></td>
 		</tr>
 	  </table></td>
 	</tr>

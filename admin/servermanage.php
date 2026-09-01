@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+require "../includes/screenctl.php";
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
 	$task = sanitizeInput($_GET["task"] ?? "");
@@ -43,12 +44,8 @@ switch ($task) {
 			header("Location: serversummary.php?id=" . urlencode($serverid));
 			exit;
 		}
-		$sshshell = @ssh2_shell($sshconnection, "vt102", null, 400, 80, SSH2_TERM_UNIT_CHARS);
-		@fwrite($sshshell, "kill -9 `screen -list | grep \"" . $rows["serverid"] . "-" . $rows["user"] . "" . "\" | awk {'print \$1'} | cut -d . -f1`\n");
-		sleep(2);
-		@fwrite($sshshell, "screen -wipe\n");
-		sleep(2);
-		@fclose($sshshell);
+		$sessionName = screenSessionName($rows["serverid"], $rows["user"]);
+		sshExec($sshconnection, screenKillCommand($sessionName, $task == "stop" ? (string) $rows["user"] : ""));
 		dbExec("UPDATE `server` SET `online` = 'Stopped' WHERE `serverid` = '" . $serverid . "'");
 		if($task == "stop") {
 			$message = "Server Stopped: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows["name"] . "</a> (Admin)";
@@ -91,20 +88,14 @@ switch ($task) {
 			exit;
 		}
 		$startline = buildStartCommand($rows, $rows1["ip"]);
-		$sshshell = @ssh2_shell($sshconnection, "vt102", null, 400, 80, SSH2_TERM_UNIT_CHARS);
-		@fwrite($sshshell, "screen -A -m -S " . $rows["serverid"] . "-" . $rows["user"] . "\n");
-		sleep(2);
-		while ($sshline = fgets($sshshell)) {
-			if(preg_match("/not the owner of/", $sshline)) {
-				$_SESSION["msg1"] = "Session Permission Error!";
-				$_SESSION["msg2"] = "Delete /var/run/screen/S-" . $rows["user"] . " to fix issue.";
-				header("Location: serversummary.php?id=" . urlencode($serverid));
-				exit;
-			}
+		$sessionName = screenSessionName($rows["serverid"], $rows["user"]);
+		$result = sshExec($sshconnection, screenStartCommand($sessionName, $startline));
+		if(preg_match("/not the owner of/i", $result)) {
+			$_SESSION["msg1"] = "Session Permission Error!";
+			$_SESSION["msg2"] = "Delete /run/screen/S-" . $rows["user"] . " on the box to fix issue.";
+			header("Location: serversummary.php?id=" . urlencode($serverid));
+			exit;
 		}
-		@fwrite($sshshell, $startline . "\n");
-		sleep(3);
-		@fclose($sshshell);
 		dbExec("UPDATE `server` SET `online` = 'Started' WHERE `serverid` = '" . $rows["serverid"] . "'");
 		if($task == "start") {
 			$message = "Server Started: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows["name"] . "</a> (Admin)";

@@ -5,8 +5,10 @@ $tab = "4";
 $return = "boxsummary.php?id=" . ($_GET["id"] ?? "");
 require "../configuration.php";
 require "./include.php";
+require "../includes/boxctl.php";
 $boxid = sanitizeInput($_GET["id"] ?? "");
 $rows = dbRow("SELECT * FROM `box` WHERE `boxid` = '" . $boxid . "' LIMIT 1");
+$stats = getBoxStats($rows);
 $result1 = dbQuery("SELECT * FROM `ip` WHERE `boxid` = '" . $boxid . "' ORDER BY `ip`");
 $result3 = dbQuery("SELECT * FROM `log` WHERE `boxid` = '" . $boxid . "' ORDER BY `logid` DESC LIMIT 5");
 $tabs = array("Summary" => "boxsummary.php?id=" . $rows["boxid"], "Profile" => "boxprofile.php?id=" . $rows["boxid"], "Servers" => "boxserver.php?id=" . $rows["boxid"], "Game Files" => "boxgamefile.php?id=" . $rows["boxid"], "Activity Logs" => "boxlog.php?id=" . $rows["boxid"]);
@@ -65,12 +67,65 @@ renderTabs($tabs, 1);
 			  </tr>
 			  <tr>
 				<td class="fieldname" style="height:20px;">CPU Load</td>
-				<td class="fieldarea"><?= $rows["load"] ?></td>
+				<td class="fieldarea"><?= ($rows["load"] === "" || $rows["load"] === "~") ? "&mdash;" : htmlspecialchars($rows["load"]) ?></td>
 			  </tr>
 			  <tr>
 				<td class="fieldname" style="height:20px;">CPU Idle</td>
-				<td class="fieldarea"><?= $rows["idle"] ?></td>
+				<td class="fieldarea"><?= ($rows["idle"] === "" || $rows["idle"] === "~") ? "&mdash;" : htmlspecialchars($rows["idle"]) ?></td>
 			  </tr>
+			</table>
+			</fieldset>
+			<fieldset>
+			<table width="100%" border="0" cellpadding="2" cellspacing="2">
+			  <tr>
+				<td colspan="2" class="fieldheader">System Information</td>
+			  </tr>
+			  <?php if (empty($stats["ok"])): ?>
+			  <tr>
+				<td colspan="2" align="center"><font color="#DD0000">Live stats unavailable &mdash; box unreachable over SSH or the root login failed.</font></td>
+			  </tr>
+			  <?php else: ?>
+			  <tr>
+				<td class="fieldname" style="height:20px;width:110px;">Linux</td>
+				<td class="fieldarea"><?= htmlspecialchars($stats["os"] ?? "") ?: "&mdash;" ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">Kernel</td>
+				<td class="fieldarea"><?= htmlspecialchars(trim(($stats["kernel"] ?? "") . " " . ($stats["arch"] ?? ""))) ?: "&mdash;" ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">CPU</td>
+				<td class="fieldarea"><?= htmlspecialchars($stats["cpu"] ?? "") ?: "&mdash;" ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">CPU MHz</td>
+				<td class="fieldarea"><?= ($stats["mhz"] ?? "") !== "" ? htmlspecialchars(number_format((float) $stats["mhz"], 0)) . " MHz" : "&mdash;" ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">Cores / Threads</td>
+				<td class="fieldarea"><?= htmlspecialchars(($stats["cores"] ?? "?") . " cores / " . ($stats["threads"] ?? "?") . " threads") ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">Load Average</td>
+				<td class="fieldarea"><?= htmlspecialchars($stats["load"] ?? "") ?: "&mdash;" ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">CPU Idle (now)</td>
+				<td class="fieldarea"><?= ($stats["idle"] ?? "") !== "" ? htmlspecialchars($stats["idle"]) . "%" : "&mdash;" ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">Memory</td>
+				<td class="fieldarea"><?= formatBoxBytes(($stats["memtotal"] ?? 0) - ($stats["memavail"] ?? 0)) ?> used / <?= formatBoxBytes($stats["memtotal"] ?? 0) ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">Storage (/)</td>
+				<td class="fieldarea"><?= formatBoxBytes($stats["diskused"] ?? 0) ?> used, <?= formatBoxBytes($stats["diskfree"] ?? 0) ?> free / <?= formatBoxBytes($stats["disktotal"] ?? 0) ?></td>
+			  </tr>
+			  <tr>
+				<td class="fieldname" style="height:20px;">Uptime</td>
+				<td class="fieldarea"><?= formatBoxUptime($stats["uptime"] ?? 0) ?></td>
+			  </tr>
+			  <?php endif; ?>
 			</table>
 			</fieldset></td>
 		  <td width="50%" valign="top"><fieldset>
@@ -158,6 +213,54 @@ renderTabs($tabs, 1);
 			</fieldset></td>
 		</tr>
 	  </table>
+	  <fieldset>
+		<table width="100%" border="0" cellpadding="2" cellspacing="2">
+		  <tr><td class="fieldheader">Console <font color="#666666" size="-2">(runs as <?= htmlspecialchars($rows["login"] ?: "root") ?> on the box)</font></td></tr>
+		  <tr><td>
+			<pre id="swConsoleOut" class="swconsole">Connecting&hellip;</pre>
+			<form onsubmit="return swConsoleSend();" style="margin:6px 0 0;">
+			  <input type="text" id="swConsoleCmd" class="text" style="width:74%;" autocomplete="off" placeholder="shell command, e.g. df -h" />
+			  <input type="submit" value="Send" class="button" />
+			  <input type="button" value="Refresh" class="button" onclick="swConsoleRefresh()" />
+			  <label style="font-size:11px;"><input type="checkbox" id="swConsoleAuto" /> Auto</label>
+			</form>
+		  </td></tr>
+		</table>
+	  </fieldset>
+	  <style type="text/css">
+	  .swconsole{background:#0b0b0b;color:#3ad33a;font:11px/1.45 "DejaVu Sans Mono",Consolas,"Courier New",monospace;height:280px;overflow:auto;padding:8px;margin:0;white-space:pre-wrap;word-break:break-all;border:1px solid #333;}
+	  </style>
+	  <script type="text/javascript">
+	  (function(){
+		var BID=<?= (int)$rows["boxid"] ?>, EP="boxconsole.php";
+		var out=document.getElementById('swConsoleOut'),
+			inp=document.getElementById('swConsoleCmd'),
+			auto=document.getElementById('swConsoleAuto'),
+			busy=false;
+		function parseJSON(s){
+		  if(window.JSON&&typeof JSON.parse==='function')return JSON.parse(s);
+		  if(window.JSON&&typeof JSON.decode==='function')return JSON.decode(s);
+		  return eval('('+s+')');
+		}
+		function send(cmd){
+		  if(busy){return;} busy=true;
+		  var x=new XMLHttpRequest();
+		  x.open('POST',EP,true);
+		  x.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		  x.onreadystatechange=function(){
+			if(x.readyState!==4){return;} busy=false;
+			var r; try{r=parseJSON(x.responseText);}catch(e){out.textContent='Console error: unexpected response.';return;}
+			if(!r.ok){out.textContent=r.error||'Console error.';return;}
+			out.textContent=r.output; out.scrollTop=out.scrollHeight;
+		  };
+		  x.send('id='+BID+'&command='+encodeURIComponent(cmd||''));
+		}
+		window.swConsoleSend=function(){ var c=inp.value; inp.value=''; send(c); if(c){ setTimeout(function(){ if(!busy){ send(''); } },2500); } return false; };
+		window.swConsoleRefresh=function(){ send(''); };
+		setInterval(function(){ if(auto&&auto.checked&&!busy){ send(''); } },5000);
+		send('');
+	  })();
+	  </script>
 	  <script language="javascript" type="text/javascript">
 		<!--
 		function doDelete(ip, id) { if (confirm("Are you sure you want to delete IP address: "+ip+"?")) { window.location='boxprocess.php?task=boxipdelete&ipid='+id; } }
