@@ -242,6 +242,7 @@ h1, h2, h3 { margin: 0; color: var(--text); }
 .menutabs li.home a    { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpath d='M9 21v-8h6v8'/%3E%3C/svg%3E"); }
 .menutabs li.servers a { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='7' rx='2'/%3E%3Crect x='2' y='14' width='20' height='7' rx='2'/%3E%3Cpath d='M6 6.5h.01M6 17.5h.01'/%3E%3C/svg%3E"); }
 .menutabs li.account a { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3Cpath d='M6.8 19.5a6 6 0 0 1 10.4 0'/%3E%3C/svg%3E"); }
+.menutabs li.database a { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='5' rx='9' ry='3'/%3E%3Cpath d='M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0'/%3E%3C/svg%3E"); }
 .menutabs li.logout a  { --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='m16 17 5-5-5-5M21 12H9'/%3E%3C/svg%3E"); }
 
 #time
@@ -739,6 +740,36 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 }
 .fp-console-form { display: flex; gap: 8px; margin-top: 10px; }
 .fp-console-form input[type="text"] { flex: 1 1 auto; }
+
+/* ---- Databases page ------------------------------- */
+
+.fp-secret { color: var(--text-soft); letter-spacing: .15em; }
+.fp-reveal
+{
+    margin-left: 8px;
+    padding: 1px 7px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    font: 700 8px/1.6 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.fp-reveal:hover { color: var(--text); background: var(--hi); }
+
+.fp-meter
+{
+    height: 6px;
+    margin: 14px 0 4px;
+    border-radius: var(--pill);
+    background: var(--bg-1);
+    overflow: hidden;
+}
+.fp-meter span { display: block; height: 100%; background: var(--accent); border-radius: var(--pill); transition: width var(--dur) var(--ease); }
+.fp-meter-label { color: var(--faint); font: 500 10px/1.4 var(--mono); }
+.fp-dbcard .fp-form-actions { margin-top: 14px; }
 
 /* ---- Legacy fallback (views this theme does not override) ---- */
 

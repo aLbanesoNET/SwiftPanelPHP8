@@ -110,6 +110,26 @@ CREATE TABLE IF NOT EXISTS `config` (
   KEY `setting` (`setting`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `clientdatabase`
+--
+
+CREATE TABLE IF NOT EXISTS `clientdatabase` (
+  `dbid` int(10) unsigned NOT NULL auto_increment,
+  `clientid` int(10) unsigned NOT NULL,
+  `dbname` varchar(64) NOT NULL,
+  `dbuser` varchar(32) NOT NULL,
+  `dbpass` text NOT NULL,
+  `dbhost` varchar(64) NOT NULL default '%',
+  `maxsize` int(10) unsigned NOT NULL default '0',
+  `disksize` decimal(12,2) NOT NULL default '0.00',
+  `created` datetime default NULL,
+  PRIMARY KEY  (`dbid`),
+  UNIQUE KEY `dbname` (`dbname`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --
@@ -121,7 +141,12 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('key', ''),
 ('panelversion', '1.6.1'),
 ('template', 'bootstrap'),
-('country', 'US');
+('country', 'US'),
+('clientdb_enabled', '0'),
+('clientdb_max', '2'),
+('clientdb_maxsize', '200'),
+('clientdb_host', '%'),
+('clientdb_pma', '');
 
 -- --------------------------------------------------------
 

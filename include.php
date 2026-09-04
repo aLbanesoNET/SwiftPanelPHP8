@@ -71,3 +71,7 @@ $FLASH_MSG1 = $_SESSION['msg1'] ?? null;
 $FLASH_MSG2 = $_SESSION['msg2'] ?? null;
 
 unset($_SESSION['msg1'], $_SESSION['msg2']);
+
+// Client-databases feature toggle (config row absent on pre-feature databases).
+$cdbEnabledRow    = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_enabled' LIMIT 1", true);
+$CLIENTDB_ENABLED = (($cdbEnabledRow['value'] ?? '0') === '1');

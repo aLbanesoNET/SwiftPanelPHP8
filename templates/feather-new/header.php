@@ -36,6 +36,7 @@ $navItem = static function (string $href, string $key, string $label, string $ac
 		<ul class="menutabs">
 			<?= $navItem('index.php',  'home',    'Dashboard',  'index') ?>
 			<?= $navItem('server.php', 'servers', 'My Servers', 'server|serverftp') ?>
+			<?php if (!empty($CLIENTDB_ENABLED)): ?><?= $navItem('clientdatabases.php', 'database', 'Databases', 'database') ?><?php endif; ?>
 		</ul>
 
 		<p class="nav-sec">Account</p>

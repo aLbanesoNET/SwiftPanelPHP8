@@ -47,6 +47,28 @@ switch ($task) {
 		dbExec("UPDATE `config` SET `value` = '" . $systemurl . "' WHERE `setting` = 'systemurl'");
 		dbExec("UPDATE `config` SET `value` = '" . $template . "' WHERE `setting` = 'template'");
 		dbExec("UPDATE `config` SET `value` = '" . $country . "' WHERE `setting` = 'country'");
+
+		// Client MySQL databases
+		$cdbEnabled = (($_POST["clientdb_enabled"] ?? "0") === "1") ? "1" : "0";
+		$cdbMax     = (string) max(0, (int) ($_POST["clientdb_max"] ?? 0));
+		$cdbMaxsize = (string) max(0, (int) ($_POST["clientdb_maxsize"] ?? 0));
+		$cdbHost    = preg_replace('/[^A-Za-z0-9_.%:\-]/', '', (string) ($_POST["clientdb_host"] ?? "%"));
+		if ($cdbHost === "") { $cdbHost = "%"; }
+		$cdbPma     = sanitizeInput($_POST["clientdb_pma"] ?? "");
+		foreach ([
+			"clientdb_enabled" => $cdbEnabled,
+			"clientdb_max"     => $cdbMax,
+			"clientdb_maxsize" => $cdbMaxsize,
+			"clientdb_host"    => $cdbHost,
+			"clientdb_pma"     => $cdbPma,
+		] as $setting => $value) {
+			if (dbCount("SELECT `setting` FROM `config` WHERE `setting` = '" . $setting . "'") > 0) {
+				dbExec("UPDATE `config` SET `value` = '" . dbEscape($value) . "' WHERE `setting` = '" . $setting . "'");
+			} else {
+				dbExec("INSERT INTO `config` SET `setting` = '" . $setting . "', `value` = '" . dbEscape($value) . "'");
+			}
+		}
+
 		$_SESSION["msg1"] = "Settings Updated Successfully!";
 		$_SESSION["msg2"] = "Your changes to the settings have been saved.";
 		header("Location: configgeneral.php");

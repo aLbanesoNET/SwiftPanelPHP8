@@ -10,6 +10,17 @@ $panelname = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'panelname' L
 $systemurl = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'systemurl' LIMIT 1");
 $template = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'template' LIMIT 1");
 $country = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'country' LIMIT 1");
+
+$cdbEnabled = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_enabled' LIMIT 1", true);
+$cdbMax     = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_max' LIMIT 1", true);
+$cdbMaxsize = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_maxsize' LIMIT 1", true);
+$cdbHost    = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_host' LIMIT 1", true);
+$cdbPma     = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_pma' LIMIT 1", true);
+$vCdbEnabled = ($cdbEnabled["value"] ?? "0") === "1";
+$vCdbMax     = (string) (int) ($cdbMax["value"] ?? "2");
+$vCdbMaxsize = (string) (int) ($cdbMaxsize["value"] ?? "200");
+$vCdbHost    = (string) ($cdbHost["value"] ?? "%");
+$vCdbPma     = (string) ($cdbPma["value"] ?? "");
 if(empty($_SESSION["panelname"])) {
 	$_SESSION["panelname"] = $panelname["value"];
 }
@@ -72,6 +83,39 @@ echo renderMessageBox();
 			  <?php endforeach; ?>
 			  </select><br />
 			  <font color="#222222" size="-2">Theme folder under <code>templates/</code> — applies to the client area and admin</font></td>
+		  </tr>
+		  </table>
+		</fieldset>
+		<fieldset>
+		<table width="100%" border="0" cellpadding="2" cellspacing="2">
+		  <tr><td colspan="2" class="fieldheader">Client MySQL Databases</td></tr>
+		  <tr>
+			<td class="fieldname" style="width:140px;">Enable Feature</td>
+			<td class="fieldarea"><select name="clientdb_enabled" class="select">
+			  <option value="0"<?= $vCdbEnabled ? '' : ' selected="selected"' ?>>No</option>
+			  <option value="1"<?= $vCdbEnabled ? ' selected="selected"' : '' ?>>Yes</option>
+			  </select><br />
+			  <font color="#222222" size="-2">Let clients create MySQL databases on this panel's database server. Requires the panel DB user to hold <code>CREATE</code>, <code>CREATE USER</code> and <code>GRANT OPTION</code> globally.</font></td>
+		  </tr>
+		  <tr>
+			<td class="fieldname">Max Per Client</td>
+			<td class="fieldarea"><input type="text" name="clientdb_max" class="text" size="6" value="<?= htmlspecialchars($vCdbMax) ?>" />
+			  <font color="#222222" size="-2">&nbsp;0 = unlimited</font></td>
+		  </tr>
+		  <tr>
+			<td class="fieldname">Size Limit (MB)</td>
+			<td class="fieldarea"><input type="text" name="clientdb_maxsize" class="text" size="6" value="<?= htmlspecialchars($vCdbMaxsize) ?>" />
+			  <font color="#222222" size="-2">&nbsp;Shown to clients as a guideline. Size is measured and displayed, not enforced.</font></td>
+		  </tr>
+		  <tr>
+			<td class="fieldname">Allowed Host</td>
+			<td class="fieldarea"><input type="text" name="clientdb_host" class="text" size="20" value="<?= htmlspecialchars($vCdbHost) ?>" />
+			  <font color="#222222" size="-2">&nbsp;MySQL "connect from" host for the created user. <code>%</code> = anywhere, <code>localhost</code> = same machine only.</font></td>
+		  </tr>
+		  <tr>
+			<td class="fieldname">phpMyAdmin URL</td>
+			<td class="fieldarea"><input type="text" name="clientdb_pma" class="text" size="45" value="<?= htmlspecialchars($vCdbPma) ?>" />
+			  <font color="#222222" size="-2">&nbsp;Optional. Shown to clients as a management link.</font></td>
 		  </tr>
 		  </table>
 		</fieldset></td>

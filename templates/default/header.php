@@ -17,6 +17,9 @@
 		<ul class="menutabs">
 			<li class="home"><a href="index.php">Home</a></li>
 			<li class="servers"><a href="server.php">My Servers</a></li>
+			<?php if (!empty($CLIENTDB_ENABLED)): ?>
+			<li class="database"><a href="clientdatabases.php">Databases</a></li>
+			<?php endif; ?>
 		</ul>
 	</div>
 	<div id="right">

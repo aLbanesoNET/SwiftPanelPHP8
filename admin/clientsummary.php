@@ -173,6 +173,36 @@ renderTabs($tabs, 1);
 			</table>
 			</fieldset></td>
 		</tr>
+		<?php
+		$cdbEnabledRow = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_enabled' LIMIT 1", TRUE);
+		if (($cdbEnabledRow["value"] ?? "0") === "1"):
+			$resultDb = dbQuery("SELECT * FROM `clientdatabase` WHERE `clientid` = '" . $clientid . "' ORDER BY `dbid`");
+		?>
+		<tr>
+		  <td colspan="3"><fieldset>
+			<table width="100%" border="0" cellpadding="2" cellspacing="2">
+			  <tr><td class="fieldheader"><?= dbNumRows($resultDb) ?> MySQL Databases</td></tr>
+			  <tr>
+				<td align="center"><table width="100%" cellpadding="2" cellspacing="1" class="data">
+				  <tr><th>Database</th><th>Username</th><th>Host</th><th>Size</th><th width="60"></th></tr>
+				  <?php if (dbNumRows($resultDb) == 0): ?>
+				  <tr><td colspan="5"><div id="infobox2"><strong>No Databases</strong><br />This client has not created any databases.</div></td></tr>
+				  <?php endif; ?>
+				  <?php while ($dbr = dbFetch($resultDb)): ?>
+				  <tr onmouseover="this.className='mouseover'" onmouseout="this.className=''">
+					<td><code><?= htmlspecialchars($dbr["dbname"]) ?></code></td>
+					<td><code><?= htmlspecialchars($dbr["dbuser"]) ?></code></td>
+					<td><code><?= htmlspecialchars($dbr["dbhost"]) ?></code></td>
+					<td><?= number_format((float) $dbr["disksize"], 1) ?> / <?= (int) $dbr["maxsize"] ?> MB</td>
+					<td><a href="clientdbprocess.php?task=delete&amp;dbid=<?= (int) $dbr["dbid"] ?>&amp;id=<?= $clientid ?>" onclick="return confirm('Delete database <?= htmlspecialchars($dbr["dbname"], ENT_QUOTES) ?> and all its data?');">Delete</a></td>
+				  </tr>
+				  <?php endwhile; ?>
+				</table></td>
+			  </tr>
+			</table>
+			</fieldset></td>
+		</tr>
+		<?php dbFreeResult($resultDb); endif; ?>
 	  </table>
 	  <script language="javascript" type="text/javascript">
 	  <!--

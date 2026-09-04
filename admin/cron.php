@@ -55,4 +55,22 @@ if(extension_loaded("ssh2")) {
 	}
 	dbFreeResult($result);
 }
+// Measure client-database disk usage (display only — not enforced).
+if (dbCount("SHOW TABLES LIKE 'clientdatabase'") > 0) {
+	$usage = [];
+	$ures = @mysqli_query($connection, "SELECT `table_schema` AS s, ROUND(SUM(`data_length` + `index_length`) / 1048576, 2) AS mb FROM `information_schema`.`tables` GROUP BY `table_schema`");
+	if ($ures instanceof mysqli_result) {
+		while ($urow = mysqli_fetch_assoc($ures)) {
+			$usage[$urow["s"]] = (float) $urow["mb"];
+		}
+		mysqli_free_result($ures);
+	}
+	$cdres = dbQuery("SELECT `dbid`, `dbname` FROM `clientdatabase`");
+	while ($cdrow = dbFetch($cdres)) {
+		$mb = $usage[$cdrow["dbname"]] ?? 0;
+		dbExec("UPDATE `clientdatabase` SET `disksize` = '" . (float) $mb . "' WHERE `dbid` = '" . (int) $cdrow["dbid"] . "'");
+	}
+	dbFreeResult($cdres);
+}
+
 dbExec("UPDATE `config` SET `value` = NOW() WHERE `setting` = 'lastcronrun'");
