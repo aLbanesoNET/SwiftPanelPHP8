@@ -2,10 +2,57 @@
 
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+require __DIR__ . '/includes/totp.php';
 
 $task = sanitizeInput($_POST["task"] ?? $_GET["task"] ?? "");
 
+/** Finish a successful login: set the session, remember cookie, redirect. */
+function completeClientLogin(array $user, string $return, string $remember): void
+{
+	dbExec(
+		"UPDATE client SET lastlogin=NOW(), lastip='" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "',
+		 lasthost='" . dbEscape((string) @gethostbyaddr($_SERVER["REMOTE_ADDR"] ?? "")) . "'
+		 WHERE clientid='" . (int) $user["clientid"] . "'"
+	);
+
+	$_SESSION["clientid"]        = $user["clientid"];
+	$_SESSION["clientemail"]     = $user["email"];
+	$_SESSION["clientfirstname"] = $user["firstname"];
+	$_SESSION["clientlastname"]  = $user["lastname"];
+
+	if ($remember === "on") {
+		setcookie("clientemail", $user["email"], time() + 604800, "/");
+	} else {
+		setcookie("clientemail", "", time() - 3600, "/");
+	}
+
+	unset($_SESSION["loginattempt"], $_SESSION["lockout"], $_SESSION["2fa_client"], $_SESSION["2fa_return"], $_SESSION["2fa_remember"]);
+
+	header("Location: " . ($return ?: "index.php"));
+	exit;
+}
+
 switch ($task) {
+
+	case "login2fa":
+		$code   = sanitizeInput($_POST["totpcode"] ?? "");
+		$pcid   = (int) ($_SESSION["2fa_client"] ?? 0);
+		$return = (string) ($_SESSION["2fa_return"] ?? "");
+
+		if ($pcid <= 0) {
+			header("Location: login.php");
+			exit;
+		}
+
+		$user = dbRow("SELECT clientid,email,firstname,lastname,password,totp FROM client WHERE clientid='" . $pcid . "' LIMIT 1", true);
+		if (is_array($user) && !empty($user["totp"]) && totpVerify((string) $user["totp"], $code)) {
+			completeClientLogin($user, $return, (string) ($_SESSION["2fa_remember"] ?? ""));
+		}
+
+		$_SESSION["loginerror"] = true;
+		$_SESSION["loginattempt"] = ($_SESSION["loginattempt"] ?? 0) + 1;
+		header("Location: login.php?task=2fa");
+		exit;
 
 	case "login":
 		$email = sanitizeInput($_POST["email"] ?? "");
@@ -23,7 +70,7 @@ switch ($task) {
 
 		if ($email !== "" && $password !== "") {
 			$user = dbRow(
-				"SELECT clientid,email,firstname,lastname,password,status
+				"SELECT clientid,email,firstname,lastname,password,status,totp
 				 FROM client
 				 WHERE email='{$email}'
 				 LIMIT 1",
@@ -40,29 +87,16 @@ switch ($task) {
 					dbExec("UPDATE client SET password='{$rehashed}' WHERE clientid='{$user["clientid"]}'");
 				}
 
-				dbExec(
-					"UPDATE client 
-					 SET lastlogin=NOW(),
-						 lastip='{$_SERVER["REMOTE_ADDR"]}',
-						 lasthost='".gethostbyaddr($_SERVER["REMOTE_ADDR"])."'
-					 WHERE clientid='{$user["clientid"]}'"
-				);
-
-				$_SESSION["clientid"] = $user["clientid"];
-				$_SESSION["clientemail"] = $user["email"];
-				$_SESSION["clientfirstname"] = $user["firstname"];
-				$_SESSION["clientlastname"] = $user["lastname"];
-
-				if ($remember === "on") {
-					setcookie("clientemail", $user["email"], time() + 604800, "/");
-				} else {
-					setcookie("clientemail", "", time() - 3600, "/");
+				if (!empty($user["totp"])) {
+					// Password is right — now require the authenticator code.
+					$_SESSION["2fa_client"]   = (int) $user["clientid"];
+					$_SESSION["2fa_return"]   = $return;
+					$_SESSION["2fa_remember"] = $remember;
+					header("Location: login.php?task=2fa");
+					exit;
 				}
 
-				unset($_SESSION["loginattempt"], $_SESSION["lockout"]);
-
-				header("Location: " . ($return ?: "index.php"));
-				exit;
+				completeClientLogin($user, $return, $remember);
 			}
 		}
 

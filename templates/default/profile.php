@@ -60,3 +60,26 @@
 	<input type="reset" value="Cancel Changes" class="button red" />
   </div>
 </form>
+
+<fieldset>
+  <table width="100%" border="0" cellpadding="2" cellspacing="2">
+	<tr><td colspan="2" class="fieldheader">Two-Factor Authentication (<?= !empty($totpEnabled) ? 'Enabled' : 'Disabled' ?>)</td></tr>
+	<?php if (!empty($totpEnabled)): ?>
+	<tr><td colspan="2" class="fieldarea">Your account asks for an authenticator code at sign in.
+	  <form method="post" action="profileprocess.php" style="margin-top:6px;">
+		<input type="hidden" name="task" value="2fa_disable" />
+		Current code: <input type="text" name="totpcode" class="text" size="8" maxlength="6" />
+		<input type="submit" value="Disable 2FA" class="button red" />
+	  </form></td></tr>
+	<?php else: ?>
+	<tr><td class="fieldname" style="width:140px;">Setup Key</td><td class="fieldarea"><code><?= htmlspecialchars(trim(chunk_split($totpSetup, 4, ' '))) ?></code></td></tr>
+	<tr><td class="fieldname">otpauth URI</td><td class="fieldarea"><code style="word-break:break-all;"><?= htmlspecialchars($totpUri) ?></code></td></tr>
+	<tr><td colspan="2" class="fieldarea">
+	  <form method="post" action="profileprocess.php">
+		<input type="hidden" name="task" value="2fa_enable" />
+		Add the key to your authenticator app, then enter a code: <input type="text" name="totpcode" class="text" size="8" maxlength="6" />
+		<input type="submit" value="Enable 2FA" class="button green" />
+	  </form></td></tr>
+	<?php endif; ?>
+  </table>
+</fieldset>

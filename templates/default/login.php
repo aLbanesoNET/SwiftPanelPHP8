@@ -5,7 +5,24 @@
   </tr>
 </table>
 
-<?php if (!empty($lockout)): ?>
+<?php if (!empty($twofa)): ?>
+<div align="center">
+  <?php if (!empty($login_error)): ?>
+	<div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;">
+	  <strong>Wrong or expired code.</strong><br />Enter the current 6-digit code from your authenticator app.
+	</div><br />
+  <?php endif; ?>
+  <form action="process.php" method="post">
+	<input type="hidden" name="task" value="login2fa" />
+	<table border="0" cellpadding="0" cellspacing="10">
+	  <tr><td align="right">Code:</td><td><input type="text" name="totpcode" class="text" size="10" maxlength="6" autocomplete="one-time-code" autofocus /></td></tr>
+	  <tr><td colspan="2" align="center"><input type="submit" value="Verify" class="button" /></td></tr>
+	</table>
+  </form>
+  <br /><a href="login.php">Cancel</a>
+</div>
+
+<?php elseif (!empty($lockout)): ?>
 <div align="center">
   <div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;">
 	<strong>Too Many Incorrect Login Attempts</strong><br />

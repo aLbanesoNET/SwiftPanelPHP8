@@ -41,3 +41,30 @@
 		<button type="reset" class="fp-btn fp-btn-ghost">Cancel</button>
 	</div>
 </form>
+
+<div class="fp-card fp-form" style="max-width:640px;margin-top:16px;">
+	<div class="fp-card-head">
+		<h2>Two-factor authentication</h2>
+		<span class="fp-pill <?= !empty($totpEnabled) ? 'fp-pill-ok' : 'fp-pill-mono' ?>"><?= !empty($totpEnabled) ? 'On' : 'Off' ?></span>
+	</div>
+
+	<?php if (!empty($totpEnabled)): ?>
+		<p>Your account asks for an authenticator code at sign in.</p>
+		<form method="post" action="profileprocess.php">
+			<input type="hidden" name="task" value="2fa_disable">
+			<label class="fp-field"><span>Current code &mdash; to confirm</span><input type="text" name="totpcode" inputmode="numeric" maxlength="6"></label>
+			<div class="fp-form-actions"><button type="submit" class="fp-btn fp-btn-stop">Disable 2FA</button></div>
+		</form>
+	<?php else: ?>
+		<p>Add your authenticator app (Google Authenticator, Aegis, 1Password&hellip;), then enter a code to turn it on.</p>
+		<dl class="fp-dl">
+			<dt>Setup key</dt><dd><code><?= htmlspecialchars(trim(chunk_split($totpSetup, 4, ' '))) ?></code></dd>
+			<dt>otpauth URI</dt><dd><code style="word-break:break-all;"><?= htmlspecialchars($totpUri) ?></code></dd>
+		</dl>
+		<form method="post" action="profileprocess.php" style="margin-top:12px;">
+			<input type="hidden" name="task" value="2fa_enable">
+			<label class="fp-field"><span>Code from your app</span><input type="text" name="totpcode" inputmode="numeric" maxlength="6"></label>
+			<div class="fp-form-actions"><button type="submit" class="fp-btn">Enable 2FA</button></div>
+		</form>
+	<?php endif; ?>
+</div>

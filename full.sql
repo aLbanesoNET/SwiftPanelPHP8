@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `client` (
   `lastlogin` datetime NOT NULL,
   `lastip` text NOT NULL,
   `lasthost` text NOT NULL,
+  `totp` varchar(64) NOT NULL default '',
   `created` date NOT NULL,
   PRIMARY KEY  (`clientid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;

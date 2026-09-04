@@ -8,7 +8,22 @@ $task = $task ?? '';
 		<span class="mark">&#9656;</span> <?= htmlspecialchars(SITENAME) ?>
 	</div>
 
-	<?php if (!empty($lockout)): ?>
+	<?php if (!empty($twofa)): ?>
+		<h1 class="fp-auth-title">Verification</h1>
+		<?php if (!empty($login_error)): ?>
+			<div class="fp-note fp-note-bad"><strong>Wrong or expired code</strong><span>Try the current 6-digit code from your app.</span></div>
+		<?php endif; ?>
+		<form action="process.php" method="post" class="fp-auth-form">
+			<input type="hidden" name="task" value="login2fa">
+			<label class="fp-field">
+				<span>Authenticator code</span>
+				<input type="text" name="totpcode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" autofocus>
+			</label>
+			<button type="submit" class="fp-btn fp-btn-full">Verify</button>
+		</form>
+		<a class="fp-auth-link" href="login.php">Cancel</a>
+
+	<?php elseif (!empty($lockout)): ?>
 		<div class="fp-note fp-note-warn">
 			<strong>Too many incorrect attempts</strong>
 			<span>Please wait 5 minutes before trying again.</span>

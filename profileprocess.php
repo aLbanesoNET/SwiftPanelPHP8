@@ -3,8 +3,46 @@ $return = true;
 
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+require __DIR__ . '/includes/totp.php';
 
 $task = sanitizeInput($_POST["task"] ?? $_GET["task"] ?? "");
+
+$clientId = (int) ($_SESSION["clientid"] ?? 0);
+if (!$clientId) {
+	header("Location: login.php");
+	exit;
+}
+
+if ($task === "2fa_enable") {
+	$secret = (string) ($_SESSION["2fa_setup"] ?? "");
+	$code   = sanitizeInput($_POST["totpcode"] ?? "");
+	if ($secret !== "" && totpVerify($secret, $code)) {
+		dbExec("UPDATE `client` SET `totp` = '" . dbEscape($secret) . "' WHERE `clientid` = '" . $clientId . "'");
+		unset($_SESSION["2fa_setup"]);
+		$_SESSION["msg1"] = "Two-factor enabled";
+		$_SESSION["msg2"] = "You will be asked for a code at your next sign in.";
+	} else {
+		$_SESSION["msg1"] = "Could not enable two-factor";
+		$_SESSION["msg2"] = "That code did not match. Try again with the current code.";
+	}
+	header("Location: profile.php");
+	exit;
+}
+
+if ($task === "2fa_disable") {
+	$cur  = dbRow("SELECT `totp` FROM `client` WHERE `clientid` = '" . $clientId . "' LIMIT 1", true);
+	$code = sanitizeInput($_POST["totpcode"] ?? "");
+	if (is_array($cur) && !empty($cur["totp"]) && totpVerify((string) $cur["totp"], $code)) {
+		dbExec("UPDATE `client` SET `totp` = '' WHERE `clientid` = '" . $clientId . "'");
+		$_SESSION["msg1"] = "Two-factor disabled";
+		$_SESSION["msg2"] = "Your account no longer requires a code to sign in.";
+	} else {
+		$_SESSION["msg1"] = "Could not disable two-factor";
+		$_SESSION["msg2"] = "Enter a current code from your authenticator app to confirm.";
+	}
+	header("Location: profile.php");
+	exit;
+}
 
 if ($task !== "profile") {
 	header("Location: index.php");

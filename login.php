@@ -36,6 +36,13 @@ unset($_SESSION['success']);
 
 $remember_me = (($_COOKIE['rememberme'] ?? '') === 'on');
 
+// Second login step: authenticator code.
+$twofa = ($task === '2fa' && !empty($_SESSION['2fa_client']));
+if ($task === '2fa' && empty($_SESSION['2fa_client'])) {
+	header('Location: login.php');
+	exit;
+}
+
 require tpl('header');
 require tpl('login');
 require tpl('footer');
