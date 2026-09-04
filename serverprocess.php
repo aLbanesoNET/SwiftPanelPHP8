@@ -71,8 +71,16 @@ switch ($task) {
 			}
 		}
 
+		// Optional server rename (only when a non-empty name is submitted).
+		$newName = trim(sanitizeInput($_POST["name"] ?? ""));
+		$nameSql = "";
+		if ($newName !== "" && $newName !== (string) ($rows["name"] ?? "")) {
+			$nameSql = "`name` = '" . $newName . "', ";
+		}
+
 		dbExec(
 			"UPDATE `server` SET
+				" . $nameSql . "
 				`cfg1` = '" . $final[1] . "',
 				`cfg2` = '" . $final[2] . "',
 				`cfg3` = '" . $final[3] . "',

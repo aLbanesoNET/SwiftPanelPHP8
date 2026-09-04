@@ -73,6 +73,7 @@ for ($i = 1; $i <= 8; $i++) {
 
 			<div class="fp-card-head"><h2>Server configuration</h2></div>
 			<dl class="fp-dl">
+				<dt>Name</dt><dd><input type="text" name="name" value="<?= htmlspecialchars($srv['name'] ?? '') ?>"></dd>
 				<dt>Max slots</dt><dd><?= htmlspecialchars((string)($srv['slots'] ?? '')) ?></dd>
 				<dt>Type</dt><dd><?= htmlspecialchars($srv['type'] ?? '') ?></dd>
 
@@ -90,12 +91,10 @@ for ($i = 1; $i <= 8; $i++) {
 				<?php endfor; ?>
 			</dl>
 
-			<?php if ($anyEditable): ?>
-				<div class="fp-form-actions">
-					<button type="submit" class="fp-btn">Save changes</button>
-					<button type="reset" class="fp-btn fp-btn-ghost">Cancel</button>
-				</div>
-			<?php endif; ?>
+			<div class="fp-form-actions">
+				<button type="submit" class="fp-btn">Save changes</button>
+				<button type="reset" class="fp-btn fp-btn-ghost">Cancel</button>
+			</div>
 		</form>
 	</div>
 

@@ -103,7 +103,8 @@ $anyEditable =
 		<fieldset>
 		  <table width="100%" border="0" cellpadding="2" cellspacing="2">
 			<tr><td colspan="2" class="fieldheader">Server Configuration</td></tr>
-			<tr><td class="fieldname" style="height:20px;width:110px;">Max Slots</td><td class="fieldarea"><?= htmlspecialchars((string)($srv['slots'] ?? '')) ?></td></tr>
+			<tr><td class="fieldname" style="height:20px;width:110px;">Name</td><td class="fieldarea"><input type="text" name="name" class="text" size="30" value="<?= htmlspecialchars($srv['name'] ?? '') ?>" /></td></tr>
+			<tr><td class="fieldname" style="height:20px;">Max Slots</td><td class="fieldarea"><?= htmlspecialchars((string)($srv['slots'] ?? '')) ?></td></tr>
 			<tr><td class="fieldname" style="height:20px;">Type</td><td class="fieldarea"><?= htmlspecialchars($srv['type'] ?? '') ?></td></tr>
 
 			<?php for ($i = 1; $i <= 8; $i++): ?>
@@ -126,13 +127,11 @@ $anyEditable =
 		  </table>
 		</fieldset>
 
-		<?php if ($anyEditable): ?>
 		  <img src="templates/<?= htmlspecialchars(TEMPLATE) ?>/images/spacer.gif" height="6" width="1" alt="" /><br />
 		  <div align="center">
 			<input type="submit" value="Save Changes" class="button green" />
 			<input type="reset" value="Cancel Changes" class="button red" />
 		  </div>
-		<?php endif; ?>
 	  </form>
 	</td>
 
