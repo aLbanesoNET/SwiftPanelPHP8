@@ -178,7 +178,8 @@ if ($cInstalled):
 <div class="fp-card fp-console-card">
 	<div class="fp-card-head">
 		<h2>Console</h2>
-		<label class="fp-check fp-check-sm"><input type="checkbox" id="swConsoleAuto"> Auto-refresh</label>
+		<a class="fp-card-link" href="serverlogdownload.php?id=<?= $sid ?>">Download log</a>
+		<label class="fp-check fp-check-sm" style="margin-left:12px;"><input type="checkbox" id="swConsoleAuto"> Auto-refresh</label>
 	</div>
 	<pre id="swConsoleOut" class="swconsole">Connecting&hellip;</pre>
 	<?php if ($cOnline): ?>

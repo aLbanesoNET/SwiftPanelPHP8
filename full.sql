@@ -491,6 +491,8 @@ CREATE TABLE IF NOT EXISTS `server` (
   `fastdl` text NOT NULL,
   `disksize` bigint(20) unsigned NOT NULL default '0',
   `disktime` datetime default NULL,
+  `downcount` tinyint(3) unsigned NOT NULL default '0',
+  `downalert` datetime default NULL,
   PRIMARY KEY  (`serverid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 

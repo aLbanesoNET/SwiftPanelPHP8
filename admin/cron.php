@@ -153,19 +153,48 @@ if (dbCount("SHOW COLUMNS FROM `server` LIKE 'disksize'") > 0 && extension_loade
 	}
 }
 
-// Sample player counts for running servers (7-day history for sparklines).
+// Sample player counts for running servers (sparklines) + down-detection.
 if (dbCount("SHOW TABLES LIKE 'serverstat'") > 0) {
-	$statRes = dbQuery("SELECT `serverid`, `ipid`, `query`, `port`, `qryport`, `slots` FROM `server` WHERE `online` = 'Started' AND `query` != '' AND `query` != 'none'");
+	$hasDown = dbCount("SHOW COLUMNS FROM `server` LIKE 'downcount'") > 0;
+	$statRes = dbQuery("SELECT * FROM `server` WHERE `online` = 'Started' AND `query` != '' AND `query` != 'none'");
 	while ($ss = dbFetch($statRes)) {
 		$sipRow = dbRow("SELECT `ip` FROM `ip` WHERE `ipid` = '" . (int) $ss["ipid"] . "' LIMIT 1", TRUE);
 		$sQryIp = $sipRow["ip"] ?? "";
 		if ($sQryIp === "") { continue; }
 		$sQryPort = !empty($ss["qryport"]) ? $ss["qryport"] : $ss["port"];
 		$info = querySingleServer([$ss["query"], $sQryIp, $sQryPort]);
-		if (!is_array($info)) { continue; }
-		$players = (int) preg_replace('/\D.*/', '', (string) ($info["Players"] ?? "0"));
-		$maxp    = (int) ($info["Max Players"] ?? $ss["slots"] ?? 0);
-		dbExec("INSERT INTO `serverstat` SET `serverid` = '" . (int) $ss["serverid"] . "', `ts` = NOW(), `players` = '" . $players . "', `maxplayers` = '" . $maxp . "'");
+
+		if (is_array($info)) {
+			$players = (int) preg_replace('/\D.*/', '', (string) ($info["Players"] ?? "0"));
+			$maxp    = (int) ($info["Max Players"] ?? $ss["slots"] ?? 0);
+			dbExec("INSERT INTO `serverstat` SET `serverid` = '" . (int) $ss["serverid"] . "', `ts` = NOW(), `players` = '" . $players . "', `maxplayers` = '" . $maxp . "'");
+			if ($hasDown && (int) $ss["downcount"] > 0) {
+				dbExec("UPDATE `server` SET `downcount` = '0' WHERE `serverid` = '" . (int) $ss["serverid"] . "'");
+			}
+		} elseif ($hasDown) {
+			$n = (int) $ss["downcount"] + 1;
+			dbExec("UPDATE `server` SET `downcount` = '" . $n . "' WHERE `serverid` = '" . (int) $ss["serverid"] . "'");
+			$stale = empty($ss["downalert"]) || strtotime((string) $ss["downalert"]) < time() - 3600;
+			if ($n === 3 && $stale) {
+				dbExec("UPDATE `server` SET `downalert` = NOW() WHERE `serverid` = '" . (int) $ss["serverid"] . "'");
+				$name = htmlspecialchars((string) $ss["name"], ENT_QUOTES, "UTF-8");
+				dbExec("INSERT INTO `log` SET `clientid` = '" . (int) $ss["clientid"] . "', `serverid` = '" . (int) $ss["serverid"] . "', `boxid` = '" . (int) $ss["boxid"] . "', `message` = '" . dbEscape('Server not responding: <a href="serversummary.php?id=' . (int) $ss["serverid"] . '">' . $name . '</a>') . "', `name` = 'Monitor', `ip` = 'cron'");
+				$cli = dbRow("SELECT `email`, `firstname` FROM `client` WHERE `clientid` = '" . (int) $ss["clientid"] . "' LIMIT 1", TRUE);
+				if (is_array($cli) && !empty($cli["email"]) && is_file($path . "includes/class.phpmailer.php")) {
+					include_once $path . "includes/class.phpmailer.php";
+					try {
+						$m = new PHPMailer();
+						$m->AddAddress($cli["email"]);
+						$m->Subject = "Server alert: " . (string) $ss["name"] . " is not responding";
+						$m->Body    = "Hi " . ($cli["firstname"] ?? "") . ",\n\nYour server \"" . (string) $ss["name"]
+							. "\" has not answered a status query for several minutes. It may have crashed.\n\n"
+							. "Check it here: " . (dbRow("SELECT `value` FROM `config` WHERE `setting`='systemurl' LIMIT 1", TRUE)["value"] ?? "")
+							. "serversummary.php?id=" . (int) $ss["serverid"] . "\n";
+						$m->Send();
+					} catch (Throwable $e) { /* mail is best-effort */ }
+				}
+			}
+		}
 	}
 	dbFreeResult($statRes);
 	dbExec("DELETE FROM `serverstat` WHERE `ts` < DATE_SUB(NOW(), INTERVAL 7 DAY)");
