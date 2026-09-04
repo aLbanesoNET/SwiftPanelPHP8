@@ -11,6 +11,12 @@ switch ($task) {
 		$panelname = sanitizeInput($_POST["panelname"] ?? "");
 		$systemurl = sanitizeInput($_POST["systemurl"] ?? "");
 		$template = preg_replace('/[^A-Za-z0-9_-]/', '', sanitizeInput($_POST["template"] ?? ""));
+		// Never let a bogus value land — keep the current template if the posted
+		// one is not a real theme folder present in both templates/ and admin/templates/.
+		if ($template === "" || !is_dir(__DIR__ . "/../templates/" . $template) || !is_dir(__DIR__ . "/templates/" . $template)) {
+			$currentTpl = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'template' LIMIT 1", TRUE);
+			$template = (string) ($currentTpl["value"] ?? "default");
+		}
 		$country = sanitizeInput($_POST["country"] ?? "");
 		unset($_SESSION["msg1"]);
 		unset($_SESSION["msg2"]);

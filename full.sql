@@ -130,6 +130,22 @@ CREATE TABLE IF NOT EXISTS `clientdatabase` (
   UNIQUE KEY `dbname` (`dbname`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcement`
+--
+
+CREATE TABLE IF NOT EXISTS `announcement` (
+  `annid` int(10) unsigned NOT NULL auto_increment,
+  `title` text NOT NULL,
+  `body` text NOT NULL,
+  `active` text NOT NULL,
+  `adminname` text NOT NULL,
+  `created` datetime default NULL,
+  PRIMARY KEY  (`annid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --

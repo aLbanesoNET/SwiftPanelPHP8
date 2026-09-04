@@ -23,6 +23,23 @@ foreach ($servers as $s) {
 	<a class="fp-btn fp-btn-ghost" href="server.php">Open server list</a>
 </section>
 
+<?php if (!empty($ANNOUNCEMENTS)): ?>
+	<div class="fp-section-head"><h2>Announcements</h2><span class="fp-count"><?= count($ANNOUNCEMENTS) ?></span></div>
+	<div class="fp-srv-list">
+		<?php foreach ($ANNOUNCEMENTS as $a): ?>
+			<article class="fp-card">
+				<div class="fp-card-head">
+					<h2><?= htmlspecialchars($a['title']) ?></h2>
+					<span class="fp-card-link"><?= htmlspecialchars(date('M j', strtotime((string) $a['created']))) ?></span>
+				</div>
+				<?php foreach (preg_split('/\n\s*\n/', trim((string) $a['body'])) as $para): ?>
+					<p><?= nl2br(htmlspecialchars($para)) ?></p>
+				<?php endforeach; ?>
+			</article>
+		<?php endforeach; ?>
+	</div>
+<?php endif; ?>
+
 <div class="fp-stats">
 	<div class="fp-stat">
 		<span class="fp-stat-label">Servers</span>

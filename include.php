@@ -75,3 +75,10 @@ unset($_SESSION['msg1'], $_SESSION['msg2']);
 // Client-databases feature toggle (config row absent on pre-feature databases).
 $cdbEnabledRow    = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'clientdb_enabled' LIMIT 1", true);
 $CLIENTDB_ENABLED = (($cdbEnabledRow['value'] ?? '0') === '1');
+
+// Active announcements for the client dashboard (table absent on older DBs).
+$ANNOUNCEMENTS = [];
+$annRes = dbQuery("SELECT `title`, `body`, `created` FROM `announcement` WHERE `active` = '1' ORDER BY `annid` DESC LIMIT 5");
+while ($annRes && ($annRow = dbFetch($annRes))) {
+	$ANNOUNCEMENTS[] = $annRow;
+}

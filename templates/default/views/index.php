@@ -21,6 +21,15 @@ Welcome to your server control panel. This panel allows you to remotely control
 and monitor all your servers.
 </p>
 
+<?php if (!empty($ANNOUNCEMENTS)): ?>
+<?php foreach ($ANNOUNCEMENTS as $a): ?>
+<table width="100%" cellpadding="0" cellspacing="1" class="data" style="margin-bottom:6px;">
+  <tr><td class="fieldheader"><?= htmlspecialchars($a['title']) ?> <span style="font-weight:normal;color:#888;">&mdash; <?= htmlspecialchars(date('M j, Y', strtotime((string)$a['created']))) ?></span></td></tr>
+  <tr><td style="padding:8px 10px;"><?= nl2br(htmlspecialchars(trim((string)$a['body']))) ?></td></tr>
+</table>
+<?php endforeach; ?>
+<?php endif; ?>
+
 <table width="100%">
 <tr>
 <td width="50%" valign="top">
