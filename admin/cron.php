@@ -100,6 +100,26 @@ if (dbCount("SHOW TABLES LIKE 'schedule'") > 0) {
 			}
 		}
 
+		if ($sc["action"] === "backup") {
+			require_once $path . "includes/backup.php";
+			$bres = backupCreate($srv, is_array($sbox) ? $sbox : [], "Scheduled " . date("Y-m-d H:i"));
+			if (!empty($bres["ok"])) {
+				// keep only the newest backupMaxPerServer() archives
+				$old = dbQuery("SELECT `backupid`, `filename` FROM `backup` WHERE `serverid` = '" . (int) $srv["serverid"] . "' ORDER BY `backupid` DESC LIMIT 100 OFFSET " . max(0, backupMaxPerServer() - 1));
+				while ($ob = dbFetch($old)) {
+					backupDelete($srv, is_array($sbox) ? $sbox : [], (string) $ob["filename"]);
+					dbExec("DELETE FROM `backup` WHERE `backupid` = '" . (int) $ob["backupid"] . "'");
+				}
+				dbExec(
+					"INSERT INTO `backup` SET `serverid` = '" . (int) $srv["serverid"] . "', `clientid` = '" . (int) $srv["clientid"] . "', " .
+					"`name` = 'Scheduled backup', `filename` = '" . dbEscape($bres["filename"]) . "', `sizebytes` = '" . (int) $bres["size"] . "', `status` = 'done', `created` = NOW()"
+				);
+				$done = "backed up (" . number_format($bres["size"] / 1048576, 1) . " MB)";
+			} else {
+				$done = "backup failed";
+			}
+		}
+
 		$msg = "Scheduled " . htmlspecialchars((string) $sc["label"], ENT_QUOTES, "UTF-8")
 			. ' on <a href="serversummary.php?id=' . (int) $srv["serverid"] . '">#' . (int) $srv["serverid"] . '</a>: ' . $done;
 		dbExec(
@@ -111,6 +131,26 @@ if (dbCount("SHOW TABLES LIKE 'schedule'") > 0) {
 		dbExec("UPDATE `schedule` SET `lastrun` = NOW(), `nextrun` = '" . date("Y-m-d H:i:s", $next) . "' WHERE `schedid` = '" . (int) $sc["schedid"] . "'");
 	}
 	dbFreeResult($schedRes);
+}
+
+// Refresh one server's disk usage per run (round-robin by staleness).
+if (dbCount("SHOW COLUMNS FROM `server` LIKE 'disksize'") > 0 && extension_loaded("ssh2")) {
+	require_once $path . "includes/serverpower.php";
+	$duRow = dbRow(
+		"SELECT * FROM `server` WHERE `homedir` != '' AND (`disktime` IS NULL OR `disktime` < DATE_SUB(NOW(), INTERVAL 20 MINUTE))
+		 ORDER BY `disktime` IS NOT NULL, `disktime` ASC LIMIT 1",
+		TRUE
+	);
+	if (is_array($duRow) && !empty($duRow)) {
+		$duBox = dbRow("SELECT `ip`, `sshport` FROM `box` WHERE `boxid` = '" . (int) $duRow["boxid"] . "' LIMIT 1", TRUE);
+		$duSsh = serverPowerConnect($duRow, is_array($duBox) ? $duBox : []);
+		$bytes = 0;
+		if ($duSsh) {
+			$o = sshExec($duSsh, "du -sb --exclude=backups " . escapeshellarg(rtrim((string) $duRow["homedir"], "/")) . " 2>/dev/null", 30);
+			if (preg_match('/^(\d+)/', trim($o), $mm)) { $bytes = (int) $mm[1]; }
+		}
+		dbExec("UPDATE `server` SET `disksize` = '" . $bytes . "', `disktime` = NOW() WHERE `serverid` = '" . (int) $duRow["serverid"] . "'");
+	}
 }
 
 // Sample player counts for running servers (7-day history for sparklines).

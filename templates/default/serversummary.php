@@ -82,6 +82,9 @@ $anyEditable =
 		  <?php if (!empty($srv['boxlocation'])): ?>
 		  <tr><td class="fieldname" style="height:20px;">Location</td><td class="fieldarea"><?= htmlspecialchars($srv['boxlocation']) ?></td></tr>
 		  <?php endif; ?>
+		  <?php if (!empty($srv['disksize'])): ?>
+		  <tr><td class="fieldname" style="height:20px;">Disk Used</td><td class="fieldarea"><?= number_format(((int) $srv['disksize']) / 1048576, 1) ?> MB</td></tr>
+		  <?php endif; ?>
 
 		  <tr>
 			<td class="fieldname" style="height:20px;">Status</td>

@@ -59,6 +59,9 @@ for ($i = 1; $i <= 8; $i++) {
 				<?php if (!empty($srv['boxlocation'])): ?>
 					<dt>Location</dt><dd><?= htmlspecialchars($srv['boxlocation']) ?></dd>
 				<?php endif; ?>
+				<?php if (!empty($srv['disksize'])): ?>
+					<dt>Disk used</dt><dd><?= number_format(((int) $srv['disksize']) / 1048576, 1) ?> MB</dd>
+				<?php endif; ?>
 				<dt>Status</dt><dd><span class="fp-pill fp-pill-<?= $statusCls ?>"><?= htmlspecialchars($status) ?></span></dd>
 			</dl>
 		</div>

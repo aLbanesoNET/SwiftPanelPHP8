@@ -42,7 +42,7 @@ $schedules = $schedules ?? [];
 	  <tr><td class="fieldname" style="width:120px;">Label</td><td class="fieldarea"><input type="text" name="label" class="text" size="30" placeholder="Nightly restart" /></td></tr>
 	  <tr><td class="fieldname">Action</td><td class="fieldarea"><select name="action" class="select">
 		<option value="restart">Restart server</option><option value="stop">Stop server</option>
-		<option value="start">Start server</option><option value="command">Run console command</option>
+		<option value="start">Start server</option><option value="command">Run console command</option><option value="backup">Create a backup</option>
 	  </select></td></tr>
 	  <tr><td class="fieldname">Command</td><td class="fieldarea"><input type="text" name="command" class="text" size="40" placeholder="only for 'Run console command'" /></td></tr>
 	  <tr><td class="fieldname">Frequency</td><td class="fieldarea"><select name="freq" class="select">

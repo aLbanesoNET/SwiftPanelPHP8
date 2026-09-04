@@ -54,6 +54,7 @@ $schedules = $schedules ?? [];
 				<option value="stop">Stop server</option>
 				<option value="start">Start server</option>
 				<option value="command">Run console command</option>
+				<option value="backup">Create a backup</option>
 			</select>
 		</label>
 		<label class="fp-field">

@@ -6,7 +6,7 @@
 
 /** Allowed values. */
 function scheduleFreqs(): array   { return ['hourly', 'daily', 'weekly']; }
-function scheduleActions(): array { return ['restart', 'stop', 'start', 'command']; }
+function scheduleActions(): array { return ['restart', 'stop', 'start', 'command', 'backup']; }
 
 /**
  * Next fire time (unix ts) strictly after $fromTs, matching the schedule's
@@ -54,6 +54,9 @@ function scheduleDescribe(array $s): string
 	$action = ucfirst((string) ($s['action'] ?? ''));
 	if (($s['action'] ?? '') === 'command') {
 		$action = 'Run "' . trim((string) ($s['command'] ?? '')) . '"';
+	}
+	if (($s['action'] ?? '') === 'backup') {
+		$action = 'Back up';
 	}
 
 	$at = sprintf('%02d:%02d', (int) ($s['at_hour'] ?? 0), (int) ($s['at_minute'] ?? 0));
