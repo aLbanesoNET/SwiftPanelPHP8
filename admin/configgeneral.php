@@ -135,7 +135,11 @@ echo renderMessageBox();
 		</fieldset></td>
 	</tr>
 	<tr id="tab3" style="display:none;">
-	  <td class="tab" colspan="7"><p align="center"><b>Support Ticket Feature Coming Soon!</b></p></td>
+	  <td class="tab" colspan="7"><fieldset><table width="100%" border="0" cellpadding="2" cellspacing="2">
+		<tr><td colspan="2" class="fieldheader">Support Tickets</td></tr>
+		<tr><td class="fieldarea">Clients open tickets from <b>Support</b> in their area; staff answer them under
+		  <a href="tickets.php">Utilities &rsaquo; Support Tickets</a>. No configuration needed.</td></tr>
+	  </table></fieldset></td>
 	</tr>
   </table>
   <img src="templates/<?= TEMPLATE ?>/images/spacer.gif" height="10" width="1" alt="" /><br />

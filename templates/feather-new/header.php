@@ -41,6 +41,7 @@ $navItem = static function (string $href, string $key, string $label, string $ac
 
 		<p class="nav-sec">Account</p>
 		<ul class="menutabs">
+			<?= $navItem('tickets.php', 'support', 'Support', 'support') ?>
 			<?= $navItem('profile.php', 'account', 'Account', 'profile') ?>
 			<li class="logout"><a href="logout.php">Logout</a></li>
 		</ul>

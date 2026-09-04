@@ -188,6 +188,35 @@ CREATE TABLE IF NOT EXISTS `backup` (
   PRIMARY KEY  (`backupid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for tables `ticket` / `ticketpost`
+--
+
+CREATE TABLE IF NOT EXISTS `ticket` (
+  `ticketid` int(10) unsigned NOT NULL auto_increment,
+  `clientid` int(10) unsigned NOT NULL,
+  `subject` text NOT NULL,
+  `status` varchar(10) NOT NULL default 'open',
+  `priority` varchar(8) NOT NULL default 'normal',
+  `created` datetime default NULL,
+  `updated` datetime default NULL,
+  PRIMARY KEY  (`ticketid`),
+  KEY `clientid` (`clientid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `ticketpost` (
+  `postid` int(10) unsigned NOT NULL auto_increment,
+  `ticketid` int(10) unsigned NOT NULL,
+  `author` varchar(8) NOT NULL default 'client',
+  `name` text NOT NULL,
+  `body` text NOT NULL,
+  `created` datetime default NULL,
+  PRIMARY KEY  (`postid`),
+  KEY `ticketid` (`ticketid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --

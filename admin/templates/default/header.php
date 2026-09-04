@@ -39,6 +39,7 @@ $tab   = $tab   ?? '';
 		<ul>
 		  <li><a href="utilitieslog.php">Activity Logs</a></li>
 		  <li><a href="announce.php">Announcements</a></li>
+		  <li><a href="tickets.php">Support Tickets</a></li>
 		</ul>
 	  </li>
 	  <li class="configuration"><a href="#"<?= $tab == "6" ? ' class="current"' : '' ?>>Configuration</a>
