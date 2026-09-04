@@ -25,6 +25,7 @@
 	<div id="right">
 		<ul class="menutabs">
 			<li class="support"><a href="tickets.php">Support</a></li>
+			<li class="apikeys"><a href="apikeys.php">API Keys</a></li>
 			<li class="account"><a href="profile.php">Account</a></li>
 			<li class="logout"><a href="logout.php">Logout</a></li>
 		</ul>

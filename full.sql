@@ -234,6 +234,25 @@ CREATE TABLE IF NOT EXISTS `serverstat` (
   KEY `srv_ts` (`serverid`,`ts`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `apikey`
+--
+
+CREATE TABLE IF NOT EXISTS `apikey` (
+  `keyid` int(10) unsigned NOT NULL auto_increment,
+  `clientid` int(10) unsigned NOT NULL,
+  `label` text NOT NULL,
+  `tokenhash` char(64) NOT NULL,
+  `prefix` varchar(12) NOT NULL,
+  `readonly` char(1) NOT NULL default '1',
+  `lastused` datetime default NULL,
+  `created` datetime default NULL,
+  PRIMARY KEY  (`keyid`),
+  KEY `tokenhash` (`tokenhash`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --

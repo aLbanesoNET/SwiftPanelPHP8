@@ -15,6 +15,14 @@ RedirectMatch 403 ^/includes/
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^fastdl/([a-f0-9]{12,})/(.+)$ fastdl.php?t=$1&f=$2 [L,QSA]
+
+    # Pass the Authorization header through to PHP (api.php bearer tokens).
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 </IfModule>
 
 <IfModule mod_headers.c>
