@@ -37,7 +37,7 @@ if ($task === 'add') {
 	}
 
 	$c = dbRow("SELECT `clientid`, `email` FROM `client` WHERE `email` = '" . dbEscape($email) . "' LIMIT 1", true);
-	$subclientid = is_array($c) ? (int) $c['clientid'] : 0;
+	$subclientid = (is_array($c) && isset($c['clientid'])) ? (int) $c['clientid'] : 0;
 
 	if ($subclientid === $clientId) {
 		su_flash('That is you', 'You already own this server.', $serverid);

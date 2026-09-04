@@ -56,3 +56,13 @@ if ($templateName === "" || !is_dir(__DIR__ . "/templates/" . $templateName)) {
 	$templateName = "default";
 }
 define("TEMPLATE", $templateName);
+
+/**
+ * Path to an admin body partial for the active theme, falling back to
+ * admin/templates/default. Lets a theme ship its own page markup.
+ */
+function admin_tpl(string $name): string
+{
+	$active = __DIR__ . "/templates/" . TEMPLATE . "/" . $name . ".php";
+	return is_file($active) ? $active : __DIR__ . "/templates/default/" . $name . ".php";
+}
