@@ -41,6 +41,9 @@
 		  onclick="window.location='serverftp.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
 		  class="button blue" />
 		<?php endif; ?>
+		<input type="button" value="Players"
+		  onclick="window.location='serverplayers.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+		  class="button blue" />
 		<input type="button" value="Schedules"
 		  onclick="window.location='serverschedule.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
 		  class="button blue" />
