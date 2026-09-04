@@ -123,6 +123,15 @@ unset($_SESSION["msg1"], $_SESSION["msg2"]);
 
 $maxFilesize = ini_get("upload_max_filesize");
 
+// Bridge to the names the view partial expects.
+$srv           = $rows;
+$e_msg1        = $msg1;
+$e_msg2        = $msg2;
+$bread_crumb   = $breadCrumb;
+$path_decoded  = $pathDecoded;
+$file_contents = $filecontents;
+$max_filesize  = $maxFilesize;
+
 include __DIR__ . "/templates/default/header.php";
 include __DIR__ . "/templates/default/serverftp.php";
 include __DIR__ . "/templates/default/footer.php";

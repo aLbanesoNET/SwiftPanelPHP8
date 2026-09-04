@@ -96,11 +96,7 @@ and monitor all your servers.
 	<td><?= htmlspecialchars($srv['game']) ?></td>
 
 	<td>
-		<?php if (!empty($srv['ip'])): ?>
-			<?= htmlspecialchars($srv['ip']) ?> : <?= (int)$srv['port'] ?>
-		<?php else: ?>
-			~
-		<?php endif; ?>
+		<?php if (!empty($srv['ip'])): ?><?= htmlspecialchars($srv['ip']) ?>:<?= (int)$srv['port'] ?><?php else: ?>~<?php endif; ?>
 	</td>
 
 	<td>

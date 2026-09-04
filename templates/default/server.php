@@ -50,10 +50,10 @@
 		  <td style="line-height:13px;">
 			<b><?= htmlspecialchars($srv['servername']) ?></b><br />
 			<?= htmlspecialchars($srv['map'] ?? '') ?> ( <?= htmlspecialchars((string)($srv['players'] ?? '')) ?> )<br />
-			<i><?= htmlspecialchars($srv['ip'] ?? '') ?> <b>:</b> <?= (int)($srv['port'] ?? 0) ?></i>
+			<i><?= htmlspecialchars($srv['ip'] ?? '') ?><b>:</b><?= (int)($srv['port'] ?? 0) ?></i>
 		  </td>
 		<?php elseif (!empty($srv['ip'])): ?>
-		  <td><i><?= htmlspecialchars($srv['ip']) ?> <b>:</b> <?= (int)($srv['port'] ?? 0) ?></i></td>
+		  <td><i><?= htmlspecialchars($srv['ip']) ?><b>:</b><?= (int)($srv['port'] ?? 0) ?></i></td>
 		<?php else: ?>
 		  <td>Not Available</td>
 		<?php endif; ?>
