@@ -119,6 +119,33 @@ for ($i = 1; $i <= 8; $i++) {
 				</dl>
 			</div>
 		<?php endif; ?>
+
+		<?php if (!empty($srv['ipid'])): ?>
+			<?php
+			$fdlToken = (string) ($srv['fastdl'] ?? '');
+			$fdlBase  = rtrim(preg_replace('~/[^/]*$~', '', (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+			$fdlUrl   = $fdlBase . '/fastdl/' . $fdlToken . '/';
+			?>
+			<div class="fp-card">
+				<div class="fp-card-head">
+					<h2>FastDL</h2>
+					<span class="fp-pill <?= $fdlToken !== '' ? 'fp-pill-ok' : 'fp-pill-mono' ?>"><?= $fdlToken !== '' ? 'On' : 'Off' ?></span>
+				</div>
+				<?php if ($fdlToken !== ''): ?>
+					<p>Players download maps and assets over HTTP from the panel instead of the game server. Put this in your server config:</p>
+					<p><code style="display:block;padding:9px 11px;border:1px solid var(--line-strong);border-radius:var(--r-sm);background:var(--bg-1);word-break:break-all;">sv_downloadurl "<?= htmlspecialchars($fdlUrl) ?>"</code></p>
+					<p style="color:var(--faint);font-size:11px;">Serves from <code>~/fastdl/</code> on your server. Upload compressed files (<code>.bsp.bz2</code>, <code>.wav</code>, &hellip;) there via Web FTP.</p>
+					<div class="fp-form-actions">
+						<a class="fp-btn fp-btn-stop" href="fastdlprocess.php?task=disable&amp;serverid=<?= $sid ?>" onclick="return confirm('Turn off FastDL for this server?');">Disable FastDL</a>
+					</div>
+				<?php else: ?>
+					<p>Host your server's downloadable content (maps, models, sounds) over HTTP so players join faster.</p>
+					<div class="fp-form-actions">
+						<a class="fp-btn" href="fastdlprocess.php?task=enable&amp;serverid=<?= $sid ?>">Enable FastDL</a>
+					</div>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>
 

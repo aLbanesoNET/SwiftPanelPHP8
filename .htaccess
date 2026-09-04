@@ -11,6 +11,12 @@ Options -Indexes
 # Back-end includes not meant to be requested directly.
 RedirectMatch 403 ^/includes/
 
+# FastDL: /fastdl/<token>/<path>  ->  fastdl.php
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^fastdl/([a-f0-9]{12,})/(.+)$ fastdl.php?t=$1&f=$2 [L,QSA]
+</IfModule>
+
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"

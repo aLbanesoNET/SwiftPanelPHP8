@@ -158,6 +158,27 @@ $anyEditable =
 		  <?php endif; ?>
 		</table>
 	  </fieldset>
+
+	  <?php if (!empty($srv['ipid'])): ?>
+	  <?php
+		$fdlToken = (string)($srv['fastdl'] ?? '');
+		$fdlBase  = rtrim(preg_replace('~/[^/]*$~', '', ((($_SERVER['REQUEST_SCHEME'] ?? 'http')) . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+		$fdlUrl   = $fdlBase . '/fastdl/' . $fdlToken . '/';
+	  ?>
+	  <fieldset>
+		<table width="100%" border="0" cellpadding="2" cellspacing="2">
+		  <tr><td colspan="2" class="fieldheader">FastDL</td></tr>
+		  <?php if ($fdlToken !== ''): ?>
+		  <tr><td class="fieldname" style="height:20px;width:110px;">Status</td><td class="fieldarea"><b style="color:#669933;">Enabled</b></td></tr>
+		  <tr><td class="fieldname">Download URL</td><td class="fieldarea"><code><?= htmlspecialchars($fdlUrl) ?></code><br /><font color="#666666" size="-2">Add <code>sv_downloadurl "<?= htmlspecialchars($fdlUrl) ?>"</code> to your server config. Files are served from <code>~/fastdl/</code>.</font></td></tr>
+		  <tr><td colspan="2" align="center"><input type="button" value="Disable FastDL" class="button red" onclick="if(confirm('Turn off FastDL for this server?')){window.location='fastdlprocess.php?task=disable&amp;serverid=<?= (int)($srv['serverid'] ?? 0) ?>';}" /></td></tr>
+		  <?php else: ?>
+		  <tr><td colspan="2" class="fieldarea">Serve maps and assets over HTTP so players join faster.</td></tr>
+		  <tr><td colspan="2" align="center"><input type="button" value="Enable FastDL" class="button green" onclick="window.location='fastdlprocess.php?task=enable&amp;serverid=<?= (int)($srv['serverid'] ?? 0) ?>'" /></td></tr>
+		  <?php endif; ?>
+		</table>
+	  </fieldset>
+	  <?php endif; ?>
 	</td>
   </tr>
 </table>

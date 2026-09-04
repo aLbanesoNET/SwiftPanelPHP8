@@ -17,6 +17,9 @@ $cid = (int) ($_SESSION['clientid'] ?? 0);
 		<?php if ((int) $cfg['max'] > 0): ?>Up to <?= (int) $cfg['max'] ?> per account,<?php endif; ?>
 		<?= (int) $cfg['maxsize'] ?> MB each.</p>
 	</div>
+	<?php if (!empty($cfg['pma'])): ?>
+		<a class="fp-btn fp-btn-ghost" href="<?= htmlspecialchars($cfg['pma']) ?>" target="_blank" rel="noopener">Open phpMyAdmin &#8599;</a>
+	<?php endif; ?>
 </section>
 
 <div class="fp-section-head">
@@ -57,6 +60,9 @@ $cid = (int) ($_SESSION['clientid'] ?? 0);
 				<div class="fp-meter-label"><?= number_format($used, 1) ?> / <?= $limit ?> MB<?= $over ? ' &mdash; over limit' : '' ?></div>
 
 				<div class="fp-form-actions">
+					<?php if (!empty($cfg['pma'])): ?>
+						<a class="fp-btn fp-btn-ghost" href="<?= htmlspecialchars(rtrim($cfg['pma'], '/')) ?>/index.php?db=<?= urlencode($d['dbname']) ?>" target="_blank" rel="noopener">Manage &#8599;</a>
+					<?php endif; ?>
 					<a class="fp-btn fp-btn-ghost" href="clientdatabasesprocess.php?task=resetpw&amp;dbid=<?= (int) $d['dbid'] ?>"
 					   onclick="return confirm('Reset the password for <?= htmlspecialchars($d['dbname'], ENT_QUOTES) ?>?');">Reset password</a>
 					<a class="fp-btn fp-btn-stop" href="clientdatabasesprocess.php?task=delete&amp;dbid=<?= (int) $d['dbid'] ?>"

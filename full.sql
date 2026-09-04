@@ -329,6 +329,7 @@ CREATE TABLE IF NOT EXISTS `server` (
   `port` text NOT NULL,
   `online` text NOT NULL,
   `qryport` text NOT NULL,
+  `fastdl` text NOT NULL,
   PRIMARY KEY  (`serverid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 

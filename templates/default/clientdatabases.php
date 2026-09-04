@@ -12,7 +12,8 @@
 
 <p>MySQL databases for your game servers &mdash; use these credentials in server plugins or web tools.
 <?php if ((int) $cfg['max'] > 0): ?>Your account may hold up to <strong><?= (int) $cfg['max'] ?></strong> database(s).<?php endif; ?>
-Each has a <strong><?= (int) $cfg['maxsize'] ?> MB</strong> guideline limit.</p>
+Each has a <strong><?= (int) $cfg['maxsize'] ?> MB</strong> guideline limit.
+<?php if (!empty($cfg['pma'])): ?><a href="<?= htmlspecialchars($cfg['pma']) ?>" target="_blank" rel="noopener">Open phpMyAdmin &raquo;</a><?php endif; ?></p>
 
 <table width="100%" cellpadding="2" cellspacing="1" class="data">
   <tr>
