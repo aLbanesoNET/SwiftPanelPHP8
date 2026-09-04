@@ -143,6 +143,15 @@ $anyEditable =
 	  </fieldset>
 	  <?php endif; ?>
 
+	  <?php if (!empty($spark)): ?>
+	  <fieldset>
+		<table width="100%" border="0" cellpadding="2" cellspacing="2">
+		  <tr><td class="fieldheader">Players &mdash; Last 24h</td></tr>
+		  <tr><td style="padding:8px 6px;"><div style="height:90px;"><?= $spark ?></div></td></tr>
+		</table>
+	  </fieldset>
+	  <?php endif; ?>
+
 	  <fieldset>
 		<table width="100%" border="0" cellpadding="2" cellspacing="2">
 		  <tr><td colspan="2" class="fieldheader">Server Status</td></tr>

@@ -113,6 +113,24 @@ if (dbCount("SHOW TABLES LIKE 'schedule'") > 0) {
 	dbFreeResult($schedRes);
 }
 
+// Sample player counts for running servers (7-day history for sparklines).
+if (dbCount("SHOW TABLES LIKE 'serverstat'") > 0) {
+	$statRes = dbQuery("SELECT `serverid`, `ipid`, `query`, `port`, `qryport`, `slots` FROM `server` WHERE `online` = 'Started' AND `query` != '' AND `query` != 'none'");
+	while ($ss = dbFetch($statRes)) {
+		$sipRow = dbRow("SELECT `ip` FROM `ip` WHERE `ipid` = '" . (int) $ss["ipid"] . "' LIMIT 1", TRUE);
+		$sQryIp = $sipRow["ip"] ?? "";
+		if ($sQryIp === "") { continue; }
+		$sQryPort = !empty($ss["qryport"]) ? $ss["qryport"] : $ss["port"];
+		$info = querySingleServer([$ss["query"], $sQryIp, $sQryPort]);
+		if (!is_array($info)) { continue; }
+		$players = (int) preg_replace('/\D.*/', '', (string) ($info["Players"] ?? "0"));
+		$maxp    = (int) ($info["Max Players"] ?? $ss["slots"] ?? 0);
+		dbExec("INSERT INTO `serverstat` SET `serverid` = '" . (int) $ss["serverid"] . "', `ts` = NOW(), `players` = '" . $players . "', `maxplayers` = '" . $maxp . "'");
+	}
+	dbFreeResult($statRes);
+	dbExec("DELETE FROM `serverstat` WHERE `ts` < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+}
+
 // Measure client-database disk usage (display only — not enforced).
 if (dbCount("SHOW TABLES LIKE 'clientdatabase'") > 0) {
 	$usage = [];

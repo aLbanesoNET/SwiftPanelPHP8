@@ -78,6 +78,10 @@ if (!empty($srv["ipid"])) {
 $e_msg1 = $e_msg1 ?? ($FLASH_MSG1 ?? null);
 $e_msg2 = $e_msg2 ?? ($FLASH_MSG2 ?? null);
 
+// Player-count sparkline (empty string when there is not enough history yet).
+require __DIR__ . '/includes/spark.php';
+$spark = serverSparkline((int) ($srv['serverid'] ?? 0));
+
 include tpl('header');
 include tpl('serversummary');
 include tpl('footer');

@@ -96,6 +96,13 @@ for ($i = 1; $i <= 8; $i++) {
 	</div>
 
 	<div class="fp-col">
+		<?php if (!empty($spark)): ?>
+			<div class="fp-card">
+				<div class="fp-card-head"><h2>Players &mdash; last 24h</h2></div>
+				<div class="fp-spark-wrap"><?= $spark ?></div>
+			</div>
+		<?php endif; ?>
+
 		<div class="fp-card">
 			<div class="fp-card-head">
 				<h2>Server status</h2>

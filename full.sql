@@ -218,6 +218,22 @@ CREATE TABLE IF NOT EXISTS `ticketpost` (
   KEY `ticketid` (`ticketid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `serverstat` (player-count history for sparklines)
+--
+
+CREATE TABLE IF NOT EXISTS `serverstat` (
+  `statid` int(10) unsigned NOT NULL auto_increment,
+  `serverid` int(10) unsigned NOT NULL,
+  `ts` datetime NOT NULL,
+  `players` smallint(5) unsigned NOT NULL default '0',
+  `maxplayers` smallint(5) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`statid`),
+  KEY `srv_ts` (`serverid`,`ts`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --

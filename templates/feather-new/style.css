@@ -772,6 +772,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .fp-meter-label { color: var(--faint); font: 500 10px/1.4 var(--mono); }
 .fp-dbcard .fp-form-actions { margin-top: 14px; }
 
+/* ---- Sparkline ----------------------------------- */
+
+.fp-spark-wrap { height: 90px; }
+.fp-spark { width: 100%; height: 100%; display: block; }
+
 /* ---- Support thread ------------------------------ */
 
 .fp-thread { display: flex; flex-direction: column; gap: 10px; }
