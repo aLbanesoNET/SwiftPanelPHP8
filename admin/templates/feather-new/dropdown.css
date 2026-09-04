@@ -1,0 +1,170 @@
+/* ============================================================================
+   FEATHER-NEW · admin — sidebar navigation (replaces the UvumiTools dropdown).
+   header.php loads no dropdown.js, so this is a static, always-open list:
+   sectioned with a caret + rule, uppercase mono section labels, a full-height
+   green bar + wash on the active item. Icons are inline SVG, masked.
+   ========================================================================== */
+
+#nav .dropdown,
+#nav .dropdown ul
+{
+    visibility: visible;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    border: 0;
+}
+
+#nav .dropdown { gap: 1px; }
+#nav .dropdown li { margin: 0; padding: 0; float: none; list-style: none; }
+
+/* ---- Primary links -------------------------------------------------- */
+
+#nav .dropdown > li > a,
+#nav .dropdown ul li a
+{
+    position: relative;
+    display: flex;
+    height: 38px;
+    padding: 0 12px 0 38px;
+    align-items: center;
+    border: 0;
+    border-radius: var(--r-sm, 5px);
+    background: transparent;
+    color: var(--muted, #7e907a);
+    font: 550 13px/38px var(--font, "InterFN", system-ui, sans-serif);
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+#nav .dropdown > li > a::before
+{
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    width: 17px;
+    height: 17px;
+    background-color: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat;
+            mask: var(--icon) center / contain no-repeat;
+    transform: translateY(-50%);
+    content: "";
+}
+
+#nav .dropdown > li > a:hover,
+#nav .dropdown ul li a:hover
+{
+    color: var(--text, #e9f1e7);
+    background-color: var(--hi, #ffffff08);
+}
+
+#nav .dropdown > li > a.current
+{
+    color: var(--accent-2, #86efac);
+    background-color: rgba(var(--glow, 74, 222, 128), .1);
+    box-shadow: inset 3px 0 0 var(--accent, #4ade80);
+}
+#nav .dropdown > li > a.current::before { background-color: var(--accent, #4ade80); }
+
+/* ---- Section headers (href="#") ----------------------------------- */
+
+#nav .dropdown > li.utilities > a,
+#nav .dropdown > li.configuration > a,
+#nav .dropdown > li.utilities > a.current,
+#nav .dropdown > li.configuration > a.current
+{
+    height: 26px;
+    margin: 14px 8px 4px;
+    padding: 0 0 0 14px;
+    color: var(--faint, #536150) !important;
+    font: 700 9px/26px var(--mono, ui-monospace, monospace);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    background: none !important;
+    box-shadow: none !important;
+    border-top: 1px solid var(--line, #223020);
+    pointer-events: none;
+}
+
+#nav .dropdown > li.utilities > a::before,
+#nav .dropdown > li.configuration > a::before
+{
+    left: 0;
+    width: auto;
+    height: auto;
+    background: none !important;
+    -webkit-mask: none;
+            mask: none;
+    color: var(--accent-deep, #16a34a);
+    font: 700 9px/1 var(--mono, monospace);
+    content: "\25B8";
+}
+
+/* ---- Sub-item lists ---------------------------------------------- */
+
+#nav .dropdown li ul
+{
+    display: flex !important;
+    position: static !important;
+    visibility: visible !important;
+    margin: 1px 0 6px 12px !important;
+    padding: 0 0 0 12px !important;
+    border-left: 1px solid var(--line, #223020);
+}
+
+#nav .dropdown li ul li a
+{
+    height: 31px;
+    padding-left: 14px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 31px;
+}
+
+#nav .dropdown li ul li a::before
+{
+    position: absolute;
+    left: 0;
+    top: 50%;
+    color: var(--faint, #536150);
+    font: 700 11px/1 var(--mono, monospace);
+    transform: translateY(-50%);
+    content: "\2013";
+}
+
+#nav .dropdown li ul li a:hover::before,
+#nav .dropdown li ul li a.current::before { color: var(--accent, #4ade80); }
+#nav .dropdown ul li a.current { color: var(--accent-2, #86efac); font-weight: 700; }
+
+/* ---- Icons (inline SVG, masked) -------------------------------- */
+
+#nav .dropdown li.clients > a
+{
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+}
+
+#nav .dropdown li.servers > a
+{
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='7' rx='2'/%3E%3Crect x='2' y='14' width='20' height='7' rx='2'/%3E%3Cpath d='M6 6.5h.01M6 17.5h.01'/%3E%3C/svg%3E");
+}
+
+#nav .dropdown li.boxes > a
+{
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3'/%3E%3Cpath d='m3 8 2.4 10.4A2 2 0 0 0 7.35 20h9.3a2 2 0 0 0 1.95-1.6L21 8Z'/%3E%3Cpath d='M9 13h6'/%3E%3C/svg%3E");
+}
+
+#nav .dropdown li.account > a
+{
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3Cpath d='M6.8 19.5a6 6 0 0 1 10.4 0'/%3E%3C/svg%3E");
+}
+
+#nav .dropdown li.logout > a
+{
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='m16 17 5-5-5-5M21 12H9'/%3E%3C/svg%3E");
+}
+
+#nav .dropdown li.logout > a:hover { color: var(--bad, #f0503c); background-color: rgba(240, 80, 60, .12); }

@@ -48,6 +48,21 @@ if ($templateName === '' || !is_dir(__DIR__ . '/templates/' . $templateName)) {
 }
 define('TEMPLATE', $templateName);
 
+/**
+ * Absolute path to a template partial for the active theme, falling back to
+ * templates/default when the active theme does not ship its own copy. This is
+ * what lets a theme restructure the markup (its own header/footer/page views),
+ * not merely restyle the 2009 default layout with CSS.
+ */
+function tpl(string $name): string
+{
+	$active = __DIR__ . '/templates/' . TEMPLATE . '/' . $name . '.php';
+
+	return is_file($active)
+		? $active
+		: __DIR__ . '/templates/default/' . $name . '.php';
+}
+
 $SITE_NAME  = SITENAME;
 $SITE_TITLE = $title !== '' ? $title . ' - ' . SITENAME : SITENAME;
 $LOGGED_IN  = ($page !== 'login');

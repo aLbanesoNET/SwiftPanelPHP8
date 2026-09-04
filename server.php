@@ -40,6 +40,6 @@ $msg1 = $_SESSION["msg1"] ?? null;
 $msg2 = $_SESSION["msg2"] ?? null;
 unset($_SESSION["msg1"], $_SESSION["msg2"]);
 
-include __DIR__ . "/templates/default/header.php";
-include __DIR__ . "/templates/default/server.php";
-include __DIR__ . "/templates/default/footer.php";
+include tpl('header');
+include tpl('server');
+include tpl('footer');

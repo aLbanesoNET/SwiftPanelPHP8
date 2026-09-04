@@ -1,0 +1,173 @@
+<?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<?php
+// expects: $srv (array), $query (array|null), $e_msg1, $e_msg2
+$srv    = $srv ?? [];
+$sid    = (int)($srv['serverid'] ?? 0);
+$online = $srv['online'] ?? '';
+$status = $srv['status'] ?? '';
+
+$onlineCls = $online === 'Started' ? 'ok' : ($online === 'Pending' ? 'warn' : 'bad');
+$statusCls = $status === 'Active'  ? 'ok' : ($status === 'Pending' ? 'warn' : 'bad');
+
+$anyEditable = false;
+for ($i = 1; $i <= 8; $i++) {
+	if (!empty($srv["cfg{$i}edit"])) { $anyEditable = true; break; }
+}
+?>
+<?php if (!empty($e_msg1)): ?>
+	<div class="fp-note fp-note-ok">
+		<strong><?= htmlspecialchars($e_msg1) ?></strong>
+		<span><?= htmlspecialchars($e_msg2 ?? '') ?></span>
+	</div>
+<?php endif; ?>
+
+<section class="fp-powerbar">
+	<div class="fp-powerbar-id">
+		<span class="fp-dot fp-dot-<?= $online === 'Started' ? 'ok' : ($online === 'Pending' ? 'warn' : 'off') ?>"></span>
+		<h1><?= htmlspecialchars($srv['name'] ?? ('Server #' . $sid)) ?></h1>
+		<span class="fp-pill fp-pill-<?= $statusCls ?>"><?= htmlspecialchars($status) ?></span>
+		<span class="fp-pill fp-pill-mono">#<?= $sid ?></span>
+	</div>
+
+	<div class="fp-powerbar-act">
+		<?php if ($status === 'Active' && $online === 'Stopped'): ?>
+			<a class="fp-btn fp-btn-go" href="servermanage.php?task=start&amp;serverid=<?= $sid ?>">&#9658; Start</a>
+			<?php if (!empty($srv['installdir'])): ?>
+				<a class="fp-btn fp-btn-ghost" href="#"
+				   onclick="if(confirm('Reinstall server #<?= $sid ?> - <?= htmlspecialchars(addslashes((string)($srv['name'] ?? '')), ENT_QUOTES) ?>?\n\nEvery file in the server directory will be deleted and replaced with a fresh copy.')){window.location='serverrebuild.php?task=serverrebuild&serverid=<?= $sid ?>';}return false;">Reinstall</a>
+			<?php endif; ?>
+		<?php elseif ($status === 'Active' && $online === 'Started'): ?>
+			<a class="fp-btn" href="servermanage.php?task=restart&amp;serverid=<?= $sid ?>">&#8635; Restart</a>
+			<a class="fp-btn fp-btn-stop" href="servermanage.php?task=stop&amp;serverid=<?= $sid ?>">&#9632; Stop</a>
+		<?php endif; ?>
+
+		<?php if (!empty($srv['webftp'])): ?>
+			<a class="fp-btn fp-btn-ghost" href="serverftp.php?id=<?= $sid ?>">Web FTP</a>
+		<?php endif; ?>
+	</div>
+</section>
+
+<div class="fp-grid fp-grid-2">
+	<div class="fp-col">
+		<div class="fp-card">
+			<div class="fp-card-head"><h2>Server information</h2></div>
+			<dl class="fp-dl">
+				<dt>Name</dt><dd><?= htmlspecialchars($srv['name'] ?? '') ?></dd>
+				<dt>Game</dt><dd><?= htmlspecialchars($srv['game'] ?? '') ?></dd>
+				<?php if (!empty($srv['boxlocation'])): ?>
+					<dt>Location</dt><dd><?= htmlspecialchars($srv['boxlocation']) ?></dd>
+				<?php endif; ?>
+				<dt>Status</dt><dd><span class="fp-pill fp-pill-<?= $statusCls ?>"><?= htmlspecialchars($status) ?></span></dd>
+			</dl>
+		</div>
+
+		<form method="post" action="serverprocess.php" class="fp-card">
+			<input type="hidden" name="task" value="serveredit">
+			<input type="hidden" name="serverid" value="<?= $sid ?>">
+
+			<div class="fp-card-head"><h2>Server configuration</h2></div>
+			<dl class="fp-dl">
+				<dt>Max slots</dt><dd><?= htmlspecialchars((string)($srv['slots'] ?? '')) ?></dd>
+				<dt>Type</dt><dd><?= htmlspecialchars($srv['type'] ?? '') ?></dd>
+
+				<?php for ($i = 1; $i <= 8; $i++): ?>
+					<?php if (!empty($srv["cfg{$i}name"])): ?>
+						<dt><?= htmlspecialchars($srv["cfg{$i}name"]) ?></dt>
+						<dd>
+							<?php if (!empty($srv["cfg{$i}edit"])): ?>
+								<input type="text" name="cfg<?= $i ?>" value="<?= htmlspecialchars($srv["cfg{$i}"] ?? '') ?>">
+							<?php else: ?>
+								<?= htmlspecialchars($srv["cfg{$i}"] ?? '') ?>
+							<?php endif; ?>
+						</dd>
+					<?php endif; ?>
+				<?php endfor; ?>
+			</dl>
+
+			<?php if ($anyEditable): ?>
+				<div class="fp-form-actions">
+					<button type="submit" class="fp-btn">Save changes</button>
+					<button type="reset" class="fp-btn fp-btn-ghost">Cancel</button>
+				</div>
+			<?php endif; ?>
+		</form>
+	</div>
+
+	<div class="fp-col">
+		<div class="fp-card">
+			<div class="fp-card-head">
+				<h2>Server status</h2>
+				<a class="fp-card-link" href="#" onclick="window.location.reload();return false;">Refresh</a>
+			</div>
+			<dl class="fp-dl">
+				<dt>State</dt><dd><span class="fp-pill fp-pill-<?= $onlineCls ?>"><?= htmlspecialchars($online) ?></span></dd>
+				<?php if (!empty($query) && is_array($query)): ?>
+					<?php foreach ($query as $k => $v): ?>
+						<dt><?= htmlspecialchars((string)$k) ?></dt><dd><?= htmlspecialchars((string)$v) ?></dd>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</dl>
+		</div>
+
+		<?php if (!empty($srv['showftp']) && !empty($srv['ip'])): ?>
+			<div class="fp-card">
+				<div class="fp-card-head"><h2>FTP details</h2></div>
+				<dl class="fp-dl">
+					<dt>Host</dt><dd><code><?= htmlspecialchars($srv['ip']) ?>:<?= htmlspecialchars((string)($srv['ftpport'] ?? '')) ?></code></dd>
+					<dt>User</dt><dd><code><?= htmlspecialchars($srv['user'] ?? '') ?></code></dd>
+					<dt>Password</dt><dd><code><?= htmlspecialchars($srv['password'] ?? '') ?></code></dd>
+				</dl>
+			</div>
+		<?php endif; ?>
+	</div>
+</div>
+
+<?php
+$cOnline    = ($online === 'Started');
+$cInstalled = !empty($srv['ipid']);
+if ($cInstalled):
+?>
+<div class="fp-card fp-console-card">
+	<div class="fp-card-head">
+		<h2>Console</h2>
+		<label class="fp-check fp-check-sm"><input type="checkbox" id="swConsoleAuto"> Auto-refresh</label>
+	</div>
+	<pre id="swConsoleOut" class="swconsole">Connecting&hellip;</pre>
+	<form onsubmit="return swConsoleSend();" class="fp-console-form">
+		<input type="text" id="swConsoleCmd" autocomplete="off" placeholder="command, e.g. status" <?= $cOnline ? '' : 'disabled' ?>>
+		<button type="submit" class="fp-btn" <?= $cOnline ? '' : 'disabled' ?>>Send</button>
+		<button type="button" class="fp-btn fp-btn-ghost" onclick="swConsoleRefresh()">Refresh</button>
+	</form>
+</div>
+<script type="text/javascript">
+(function(){
+  var SID=<?= $sid ?>, EP="serverconsole.php";
+  var out=document.getElementById('swConsoleOut'),
+	  inp=document.getElementById('swConsoleCmd'),
+	  auto=document.getElementById('swConsoleAuto'),
+	  busy=false;
+  function parseJSON(s){
+	if(window.JSON&&typeof JSON.parse==='function')return JSON.parse(s);
+	if(window.JSON&&typeof JSON.decode==='function')return JSON.decode(s);
+	return eval('('+s+')');
+  }
+  function send(cmd){
+	if(busy){return;} busy=true;
+	var x=new XMLHttpRequest();
+	x.open('POST',EP,true);
+	x.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+	x.onreadystatechange=function(){
+	  if(x.readyState!==4){return;} busy=false;
+	  var r; try{r=parseJSON(x.responseText);}catch(e){out.textContent='Console error: unexpected response.';return;}
+	  if(!r.ok){out.textContent=r.error||'Console error.';return;}
+	  out.textContent=r.output; out.scrollTop=out.scrollHeight;
+	};
+	x.send('id='+SID+'&command='+encodeURIComponent(cmd||''));
+  }
+  window.swConsoleSend=function(){ var c=inp.value; inp.value=''; send(c); if(c){ setTimeout(function(){ if(!busy){ send(''); } },2500); } return false; };
+  window.swConsoleRefresh=function(){ send(''); };
+  setInterval(function(){ if(auto&&auto.checked&&!busy){ send(''); } },5000);
+  send('');
+})();
+</script>
+<?php endif; ?>

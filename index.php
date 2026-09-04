@@ -44,6 +44,6 @@ $client = [
 	'servers'    => count($servers),
 ];
 
-require __DIR__ . '/templates/default/header.php';
-require __DIR__ . '/templates/default/index.php';
-require __DIR__ . '/templates/default/footer.php';
+require tpl('header');
+require tpl('index');
+require tpl('footer');

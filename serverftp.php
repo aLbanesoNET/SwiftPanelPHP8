@@ -132,6 +132,6 @@ $path_decoded  = $pathDecoded;
 $file_contents = $filecontents;
 $max_filesize  = $maxFilesize;
 
-include __DIR__ . "/templates/default/header.php";
-include __DIR__ . "/templates/default/serverftp.php";
-include __DIR__ . "/templates/default/footer.php";
+include tpl('header');
+include tpl('serverftp');
+include tpl('footer');

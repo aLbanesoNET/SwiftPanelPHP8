@@ -36,6 +36,6 @@ unset($_SESSION['success']);
 
 $remember_me = (($_COOKIE['rememberme'] ?? '') === 'on');
 
-require __DIR__ . '/templates/default/header.php';
-require __DIR__ . '/templates/default/login.php';
-require __DIR__ . '/templates/default/footer.php';
+require tpl('header');
+require tpl('login');
+require tpl('footer');

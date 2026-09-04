@@ -78,6 +78,6 @@ if (!empty($srv["ipid"])) {
 $e_msg1 = $e_msg1 ?? ($FLASH_MSG1 ?? null);
 $e_msg2 = $e_msg2 ?? ($FLASH_MSG2 ?? null);
 
-include __DIR__ . "/templates/default/header.php";
-include __DIR__ . "/templates/default/serversummary.php";
-include __DIR__ . "/templates/default/footer.php";
+include tpl('header');
+include tpl('serversummary');
+include tpl('footer');
