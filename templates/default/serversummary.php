@@ -44,6 +44,9 @@
 		<input type="button" value="Schedules"
 		  onclick="window.location='serverschedule.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
 		  class="button blue" />
+		<input type="button" value="Backups"
+		  onclick="window.location='serverbackup.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+		  class="button blue" />
 	  </td>
   </tr>
 </table>

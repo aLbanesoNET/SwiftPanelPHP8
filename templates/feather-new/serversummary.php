@@ -45,6 +45,7 @@ for ($i = 1; $i <= 8; $i++) {
 			<a class="fp-btn fp-btn-ghost" href="serverftp.php?id=<?= $sid ?>">Web FTP</a>
 		<?php endif; ?>
 		<a class="fp-btn fp-btn-ghost" href="serverschedule.php?id=<?= $sid ?>">Schedules</a>
+		<a class="fp-btn fp-btn-ghost" href="serverbackup.php?id=<?= $sid ?>">Backups</a>
 	</div>
 </section>
 

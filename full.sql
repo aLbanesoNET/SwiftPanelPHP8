@@ -170,6 +170,24 @@ CREATE TABLE IF NOT EXISTS `schedule` (
   KEY `due` (`enabled`,`nextrun`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `backup`
+--
+
+CREATE TABLE IF NOT EXISTS `backup` (
+  `backupid` int(10) unsigned NOT NULL auto_increment,
+  `serverid` int(10) unsigned NOT NULL,
+  `clientid` int(10) unsigned NOT NULL,
+  `name` text NOT NULL,
+  `filename` varchar(128) NOT NULL,
+  `sizebytes` bigint(20) unsigned NOT NULL default '0',
+  `status` varchar(12) NOT NULL default 'done',
+  `created` datetime default NULL,
+  PRIMARY KEY  (`backupid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --
