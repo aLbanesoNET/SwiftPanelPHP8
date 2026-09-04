@@ -51,7 +51,7 @@ switch ($task) {
 			$message = "Server Stopped: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows["name"] . "</a> (Admin)";
 			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
 			$_SESSION["msg1"] = "Server Stopped Successfully!";
-			$_SESSION["msg2"] = "<br />";
+			$_SESSION["msg2"] = "The server has been stopped.";
 			if(!empty($return)) {
 				header("Location: " . $return);
 			} else {

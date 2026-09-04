@@ -129,7 +129,7 @@ switch ($task) {
 			);
 
 			$_SESSION["msg1"] = "Server Stopped Successfully!";
-			$_SESSION["msg2"] = "<br />";
+			$_SESSION["msg2"] = "The server has been stopped.";
 
 			header("Location: " . (!empty($returnTo) ? $returnTo : "serversummary.php?id=" . urlencode($serverid)));
 			exit;
