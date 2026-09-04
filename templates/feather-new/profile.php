@@ -68,3 +68,15 @@
 		</form>
 	<?php endif; ?>
 </div>
+
+<?php if (!empty($loginHistory)): ?>
+	<div class="fp-card" style="max-width:640px;margin-top:16px;">
+		<div class="fp-card-head"><h2>Recent sign-ins</h2></div>
+		<dl class="fp-dl">
+			<?php foreach ($loginHistory as $h): ?>
+				<dt><?= htmlspecialchars(date('M j, H:i', strtotime((string) $h['ts']))) ?></dt>
+				<dd><code><?= htmlspecialchars($h['ip']) ?></code> &middot; <?= $h['method'] === '2fa' ? '2FA' : 'password' ?><?= !empty($h['agent']) ? ' &middot; ' . htmlspecialchars(substr(preg_replace('/\(.*?\)/', '', $h['agent']), 0, 40)) : '' ?></dd>
+			<?php endforeach; ?>
+		</dl>
+	</div>
+<?php endif; ?>

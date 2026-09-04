@@ -272,6 +272,23 @@ CREATE TABLE IF NOT EXISTS `subuser` (
   KEY `subclientid` (`subclientid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `loginlog`
+--
+
+CREATE TABLE IF NOT EXISTS `loginlog` (
+  `logid` int(10) unsigned NOT NULL auto_increment,
+  `clientid` int(10) unsigned NOT NULL,
+  `ip` varchar(45) NOT NULL,
+  `agent` varchar(255) NOT NULL,
+  `method` varchar(10) NOT NULL default 'password',
+  `ts` datetime NOT NULL,
+  PRIMARY KEY  (`logid`),
+  KEY `clientid` (`clientid`,`ts`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --

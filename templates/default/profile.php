@@ -83,3 +83,16 @@
 	<?php endif; ?>
   </table>
 </fieldset>
+
+<?php if (!empty($loginHistory)): ?>
+<fieldset>
+  <table width="100%" cellpadding="2" cellspacing="1" class="data">
+	<tr><td colspan="3" class="fieldheader">Recent Sign-ins</td></tr>
+	<?php foreach ($loginHistory as $h): ?>
+	<tr><td width="140"><?= htmlspecialchars(date('M j, Y H:i', strtotime((string) $h['ts']))) ?></td>
+		<td width="120"><code><?= htmlspecialchars($h['ip']) ?></code></td>
+		<td><?= $h['method'] === '2fa' ? '2FA' : 'password' ?></td></tr>
+	<?php endforeach; ?>
+  </table>
+</fieldset>
+<?php endif; ?>

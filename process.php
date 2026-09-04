@@ -7,8 +7,21 @@ require __DIR__ . '/includes/totp.php';
 $task = sanitizeInput($_POST["task"] ?? $_GET["task"] ?? "");
 
 /** Finish a successful login: set the session, remember cookie, redirect. */
-function completeClientLogin(array $user, string $return, string $remember): void
+function completeClientLogin(array $user, string $return, string $remember, string $method = 'password'): void
 {
+	if (dbCount("SHOW TABLES LIKE 'loginlog'") > 0) {
+		dbExec(
+			"INSERT INTO `loginlog` SET `clientid` = '" . (int) $user["clientid"] . "', " .
+			"`ip` = '" . dbEscape(substr($_SERVER["REMOTE_ADDR"] ?? "", 0, 45)) . "', " .
+			"`agent` = '" . dbEscape(substr($_SERVER["HTTP_USER_AGENT"] ?? "", 0, 255)) . "', " .
+			"`method` = '" . dbEscape($method) . "', `ts` = NOW()"
+		);
+		dbExec(
+			"DELETE FROM `loginlog` WHERE `clientid` = '" . (int) $user["clientid"] . "' AND `logid` NOT IN " .
+			"(SELECT `logid` FROM (SELECT `logid` FROM `loginlog` WHERE `clientid` = '" . (int) $user["clientid"] . "' ORDER BY `logid` DESC LIMIT 20) t)"
+		);
+	}
+
 	dbExec(
 		"UPDATE client SET lastlogin=NOW(), lastip='" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "',
 		 lasthost='" . dbEscape((string) @gethostbyaddr($_SERVER["REMOTE_ADDR"] ?? "")) . "'
@@ -46,7 +59,7 @@ switch ($task) {
 
 		$user = dbRow("SELECT clientid,email,firstname,lastname,password,totp FROM client WHERE clientid='" . $pcid . "' LIMIT 1", true);
 		if (is_array($user) && !empty($user["totp"]) && totpVerify((string) $user["totp"], $code)) {
-			completeClientLogin($user, $return, (string) ($_SESSION["2fa_remember"] ?? ""));
+			completeClientLogin($user, $return, (string) ($_SESSION["2fa_remember"] ?? ""), "2fa");
 		}
 
 		$_SESSION["loginerror"] = true;

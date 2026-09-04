@@ -742,6 +742,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 }
 .fp-console-form { display: flex; gap: 8px; margin-top: 10px; }
 .fp-console-form input[type="text"] { flex: 1 1 auto; }
+.fp-quickcmds { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.fp-quickcmds .fp-btn { padding: 6px 12px; }
 
 /* ---- Databases page ------------------------------- */
 

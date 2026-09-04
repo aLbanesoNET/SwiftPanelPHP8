@@ -34,6 +34,12 @@ $msg2 = $_SESSION["msg2"] ?? null;
 
 unset($_SESSION["msg1"], $_SESSION["msg2"]);
 
+$loginHistory = [];
+if (dbCount("SHOW TABLES LIKE 'loginlog'") > 0) {
+	$lh = dbQuery("SELECT * FROM `loginlog` WHERE `clientid` = '" . (int) $_SESSION["clientid"] . "' ORDER BY `logid` DESC LIMIT 8");
+	while ($lh && ($r = dbFetch($lh))) { $loginHistory[] = $r; }
+}
+
 include tpl('header');
 include tpl('profile');
 include tpl('footer');

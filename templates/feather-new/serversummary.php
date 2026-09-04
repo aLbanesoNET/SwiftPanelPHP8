@@ -181,12 +181,20 @@ if ($cInstalled):
 		<label class="fp-check fp-check-sm"><input type="checkbox" id="swConsoleAuto"> Auto-refresh</label>
 	</div>
 	<pre id="swConsoleOut" class="swconsole">Connecting&hellip;</pre>
+	<?php if ($cOnline): ?>
+	<div class="fp-quickcmds">
+		<?php foreach (['status', 'stats', 'users'] as $qc): ?>
+			<button type="button" class="fp-btn fp-btn-ghost" onclick="swConsoleQuick('<?= $qc ?>')"><?= $qc ?></button>
+		<?php endforeach; ?>
+	</div>
+	<?php endif; ?>
 	<form onsubmit="return swConsoleSend();" class="fp-console-form">
 		<input type="text" id="swConsoleCmd" autocomplete="off" placeholder="command, e.g. status" <?= $cOnline ? '' : 'disabled' ?>>
 		<button type="submit" class="fp-btn" <?= $cOnline ? '' : 'disabled' ?>>Send</button>
 		<button type="button" class="fp-btn fp-btn-ghost" onclick="swConsoleRefresh()">Refresh</button>
 	</form>
 </div>
+<script>function swConsoleQuick(c){var i=document.getElementById('swConsoleCmd');if(i){i.value=c;if(window.swConsoleSend)window.swConsoleSend();}}</script>
 <script type="text/javascript">
 (function(){
   var SID=<?= $sid ?>, EP="serverconsole.php";
