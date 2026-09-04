@@ -82,3 +82,7 @@ $annRes = dbQuery("SELECT `title`, `body`, `created` FROM `announcement` WHERE `
 while ($annRes && ($annRow = dbFetch($annRes))) {
 	$ANNOUNCEMENTS[] = $annRow;
 }
+
+// In-panel notification bell.
+require_once __DIR__ . '/includes/notify.php';
+$NOTIF_UNSEEN = notifyUnseenCount((int) ($_SESSION['clientid'] ?? 0));

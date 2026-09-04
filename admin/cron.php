@@ -21,6 +21,7 @@ require $path . "includes/functions3.php";
 require $path . "includes/mysql.php";
 include $path . "includes/ftp.php";
 error_reporting(0);
+require_once $path . "includes/notify.php";
 if(extension_loaded("ssh2")) {
 	$result = dbQuery("SELECT `boxid`, `ip`, `sshport`, `ftpport` FROM `box` ORDER BY `boxid`");
 	while ($rows = dbFetch($result)) {
@@ -115,6 +116,7 @@ if (dbCount("SHOW TABLES LIKE 'schedule'") > 0) {
 					"`name` = 'Scheduled backup', `filename` = '" . dbEscape($bres["filename"]) . "', `sizebytes` = '" . (int) $bres["size"] . "', `status` = 'done', `created` = NOW()"
 				);
 				$done = "backed up (" . number_format($bres["size"] / 1048576, 1) . " MB)";
+				notifyClient((int) $srv["clientid"], 'backup', 'Scheduled backup of ' . (string) $srv["name"], number_format($bres["size"] / 1048576, 1) . ' MB archived.', 'serverbackup.php?id=' . (int) $srv["serverid"]);
 			} else {
 				$done = "backup failed";
 			}
@@ -179,6 +181,7 @@ if (dbCount("SHOW TABLES LIKE 'serverstat'") > 0) {
 				dbExec("UPDATE `server` SET `downalert` = NOW() WHERE `serverid` = '" . (int) $ss["serverid"] . "'");
 				$name = htmlspecialchars((string) $ss["name"], ENT_QUOTES, "UTF-8");
 				dbExec("INSERT INTO `log` SET `clientid` = '" . (int) $ss["clientid"] . "', `serverid` = '" . (int) $ss["serverid"] . "', `boxid` = '" . (int) $ss["boxid"] . "', `message` = '" . dbEscape('Server not responding: <a href="serversummary.php?id=' . (int) $ss["serverid"] . '">' . $name . '</a>') . "', `name` = 'Monitor', `ip` = 'cron'");
+				notifyClient((int) $ss["clientid"], 'down', (string) $ss["name"] . ' is not responding', 'The server has not answered a status query for several minutes.', 'serversummary.php?id=' . (int) $ss["serverid"]);
 				$cli = dbRow("SELECT `email`, `firstname` FROM `client` WHERE `clientid` = '" . (int) $ss["clientid"] . "' LIMIT 1", TRUE);
 				if (is_array($cli) && !empty($cli["email"]) && is_file($path . "includes/class.phpmailer.php")) {
 					include_once $path . "includes/class.phpmailer.php";

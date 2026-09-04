@@ -24,6 +24,7 @@
 	</div>
 	<div id="right">
 		<ul class="menutabs">
+			<li class="alerts"><a href="notifications.php">Notifications<?= !empty($NOTIF_UNSEEN) ? ' (' . (int) $NOTIF_UNSEEN . ')' : '' ?></a></li>
 			<li class="support"><a href="tickets.php">Support</a></li>
 			<li class="apikeys"><a href="apikeys.php">API Keys</a></li>
 			<li class="account"><a href="profile.php">Account</a></li>

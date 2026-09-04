@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+require "../includes/notify.php";
 
 $task     = sanitizeInput($_POST["task"] ?? ($_GET["task"] ?? ""));
 $ticketid = (int) ($_POST["ticketid"] ?? ($_GET["ticketid"] ?? 0));
@@ -23,6 +24,7 @@ if ($task === "reply") {
 		);
 		$newStatus = !empty($_POST["close"]) ? "closed" : "answered";
 		dbExec("UPDATE `ticket` SET `status` = '" . $newStatus . "', `updated` = NOW() WHERE `ticketid` = '" . $ticketid . "'");
+		notifyClient((int) $ticket["clientid"], 'ticket', 'Support replied: ' . (string) $ticket["subject"], '', 'ticket.php?id=' . $ticketid);
 		$_SESSION["msg1"] = "Reply Sent";
 		$_SESSION["msg2"] = "The client can see your reply now.";
 	}

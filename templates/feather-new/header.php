@@ -66,7 +66,13 @@ function fnToggleTheme(){
 <div id="page">
 	<header id="topbar">
 		<div id="topbar-title"><?= htmlspecialchars($title !== '' ? $title : $SITE_NAME) ?></div>
-		<div id="topbar-actions"><?= $TOPBAR_ACTIONS ?? '' ?></div>
+		<div id="topbar-actions">
+			<a id="bell" href="notifications.php" title="Notifications">
+				<span class="bell-i"></span>
+				<?php if (!empty($NOTIF_UNSEEN)): ?><span class="bell-dot"><?= (int) $NOTIF_UNSEEN > 9 ? '9+' : (int) $NOTIF_UNSEEN ?></span><?php endif; ?>
+			</a>
+			<?= $TOPBAR_ACTIONS ?? '' ?>
+		</div>
 	</header>
 	<main id="content">
 		<div id="container">

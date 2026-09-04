@@ -291,6 +291,25 @@ CREATE TABLE IF NOT EXISTS `loginlog` (
   KEY `clientid` (`clientid`,`ts`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notification`
+--
+
+CREATE TABLE IF NOT EXISTS `notification` (
+  `notifid` int(10) unsigned NOT NULL auto_increment,
+  `clientid` int(10) unsigned NOT NULL,
+  `kind` varchar(12) NOT NULL default 'system',
+  `title` text NOT NULL,
+  `body` text NOT NULL,
+  `url` varchar(255) NOT NULL default '',
+  `seen` char(1) NOT NULL default '0',
+  `created` datetime default NULL,
+  PRIMARY KEY  (`notifid`),
+  KEY `client_seen` (`clientid`,`seen`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --
