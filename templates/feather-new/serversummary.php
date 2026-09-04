@@ -44,6 +44,7 @@ for ($i = 1; $i <= 8; $i++) {
 		<?php if (!empty($srv['webftp'])): ?>
 			<a class="fp-btn fp-btn-ghost" href="serverftp.php?id=<?= $sid ?>">Web FTP</a>
 		<?php endif; ?>
+		<a class="fp-btn fp-btn-ghost" href="serverschedule.php?id=<?= $sid ?>">Schedules</a>
 	</div>
 </section>
 

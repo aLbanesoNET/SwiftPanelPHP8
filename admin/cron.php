@@ -55,6 +55,64 @@ if(extension_loaded("ssh2")) {
 	}
 	dbFreeResult($result);
 }
+// Run due server schedules.
+if (dbCount("SHOW TABLES LIKE 'schedule'") > 0) {
+	require_once $path . "includes/serverpower.php";
+	require_once $path . "includes/console.php";
+	require_once $path . "includes/schedule.php";
+
+	$schedRes = dbQuery("SELECT * FROM `schedule` WHERE `enabled` = '1' AND `nextrun` IS NOT NULL AND `nextrun` <= NOW()");
+	while ($sc = dbFetch($schedRes)) {
+		$srv = dbRow("SELECT * FROM `server` WHERE `serverid` = '" . (int) $sc["serverid"] . "' LIMIT 1", TRUE);
+		if (!is_array($srv) || empty($srv)) {
+			dbExec("DELETE FROM `schedule` WHERE `schedid` = '" . (int) $sc["schedid"] . "'");
+			continue;
+		}
+
+		$sbox = dbRow("SELECT `ip`, `sshport` FROM `box` WHERE `boxid` = '" . (int) $srv["boxid"] . "' LIMIT 1", TRUE);
+		$sip  = dbRow("SELECT `ip` FROM `ip` WHERE `ipid` = '" . (int) $srv["ipid"] . "' LIMIT 1", TRUE);
+		$serverIp = $sip["ip"] ?? "";
+
+		$done = "skipped (connection failed)";
+		$ssh  = serverPowerConnect($srv, is_array($sbox) ? $sbox : []);
+		if ($ssh) {
+			switch ($sc["action"]) {
+				case "stop":
+					serverPowerStop($ssh, $srv, true);
+					dbExec("UPDATE `server` SET `online` = 'Stopped' WHERE `serverid` = '" . (int) $srv["serverid"] . "'");
+					$done = "stopped";
+					break;
+				case "start":
+					serverPowerStart($ssh, $srv, $serverIp);
+					dbExec("UPDATE `server` SET `online` = 'Started' WHERE `serverid` = '" . (int) $srv["serverid"] . "'");
+					$done = "started";
+					break;
+				case "restart":
+					serverPowerStop($ssh, $srv, false);
+					serverPowerStart($ssh, $srv, $serverIp);
+					dbExec("UPDATE `server` SET `online` = 'Started' WHERE `serverid` = '" . (int) $srv["serverid"] . "'");
+					$done = "restarted";
+					break;
+				case "command":
+					serverConsoleCommand($srv, is_array($sbox) ? $sbox : [], (string) $sc["command"]);
+					$done = "ran command";
+					break;
+			}
+		}
+
+		$msg = "Scheduled " . htmlspecialchars((string) $sc["label"], ENT_QUOTES, "UTF-8")
+			. ' on <a href="serversummary.php?id=' . (int) $srv["serverid"] . '">#' . (int) $srv["serverid"] . '</a>: ' . $done;
+		dbExec(
+			"INSERT INTO `log` SET `clientid` = '" . (int) $srv["clientid"] . "', `serverid` = '" . (int) $srv["serverid"] . "', " .
+			"`boxid` = '" . (int) $srv["boxid"] . "', `message` = '" . dbEscape($msg) . "', `name` = 'Scheduler', `ip` = 'cron'"
+		);
+
+		$next = scheduleNextRun($sc, time());
+		dbExec("UPDATE `schedule` SET `lastrun` = NOW(), `nextrun` = '" . date("Y-m-d H:i:s", $next) . "' WHERE `schedid` = '" . (int) $sc["schedid"] . "'");
+	}
+	dbFreeResult($schedRes);
+}
+
 // Measure client-database disk usage (display only — not enforced).
 if (dbCount("SHOW TABLES LIKE 'clientdatabase'") > 0) {
 	$usage = [];

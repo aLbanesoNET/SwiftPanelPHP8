@@ -35,13 +35,16 @@
 	  <?php endif; ?>
 	</td>
 
-	<?php if (!empty($srv['webftp'])): ?>
 	  <td align="right">
+		<?php if (!empty($srv['webftp'])): ?>
 		<input type="button" value="Web FTP"
 		  onclick="window.location='serverftp.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
 		  class="button blue" />
+		<?php endif; ?>
+		<input type="button" value="Schedules"
+		  onclick="window.location='serverschedule.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+		  class="button blue" />
 	  </td>
-	<?php endif; ?>
   </tr>
 </table>
 <?php endif; ?>

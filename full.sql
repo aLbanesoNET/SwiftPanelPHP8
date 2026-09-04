@@ -146,6 +146,30 @@ CREATE TABLE IF NOT EXISTS `announcement` (
   PRIMARY KEY  (`annid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `schedule`
+--
+
+CREATE TABLE IF NOT EXISTS `schedule` (
+  `schedid` int(10) unsigned NOT NULL auto_increment,
+  `serverid` int(10) unsigned NOT NULL,
+  `clientid` int(10) unsigned NOT NULL,
+  `label` text NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `command` text NOT NULL,
+  `freq` varchar(10) NOT NULL,
+  `at_minute` tinyint(3) unsigned NOT NULL default '0',
+  `at_hour` tinyint(3) unsigned NOT NULL default '0',
+  `dow` tinyint(3) unsigned NOT NULL default '0',
+  `enabled` char(1) NOT NULL default '1',
+  `lastrun` datetime default NULL,
+  `nextrun` datetime default NULL,
+  PRIMARY KEY  (`schedid`),
+  KEY `due` (`enabled`,`nextrun`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --
