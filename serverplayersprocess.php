@@ -14,7 +14,8 @@ if (!$clientId) {
 }
 
 $serverid = (int) ($_POST['serverid'] ?? ($_GET['serverid'] ?? 0));
-$srv = dbRow("SELECT * FROM `server` WHERE `serverid` = '" . $serverid . "' AND `clientid` = '" . $clientId . "' LIMIT 1", true);
+require __DIR__ . '/includes/access.php';
+$srv = serverForClient((int) $clientId, (int) $serverid);
 if (!is_array($srv) || empty($srv)) {
 	header('Location: server.php');
 	exit;

@@ -6,10 +6,14 @@ $return = "server.php";
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
 
+$cid = (int) ($_SESSION["clientid"] ?? 0);
+$sharedClause = (dbCount("SHOW TABLES LIKE 'subuser'") > 0)
+	? " OR serverid IN (SELECT serverid FROM subuser WHERE subclientid='{$cid}')"
+	: "";
 $result = dbQuery(
 	"SELECT serverid, ipid, name, game, status, online, port, `query`, qryport
 	 FROM server
-	 WHERE clientid='{$_SESSION["clientid"]}'
+	 WHERE clientid='{$cid}'" . $sharedClause . "
 	 ORDER BY serverid"
 );
 

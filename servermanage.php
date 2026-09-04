@@ -6,6 +6,7 @@ $return = true;
 require __DIR__ . "/configuration.php";
 require __DIR__ . "/include.php";
 require __DIR__ . "/includes/screenctl.php";
+require __DIR__ . "/includes/access.php";
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
 	session_start();
@@ -44,13 +45,7 @@ if ($serverid === "") {
 switch ($task) {
 	case "restart":
 	case "stop": {
-		$rows = dbRow(
-			"SELECT `serverid`, `clientid`, `boxid`, `name`, `user`, `password`, `online`, `status`
-			 FROM `server`
-			 WHERE `serverid` = '" . $serverid . "'
-			   AND `clientid` = '" . $clientId . "'
-			 LIMIT 1"
-		);
+		$rows = serverForClient((int) $clientId, (int) $serverid);
 
 		if (!is_array($rows) || empty($rows)) {
 			$_SESSION["msg1"] = "Server Error!";
@@ -140,12 +135,7 @@ switch ($task) {
 	}
 
 	case "start": {
-		$rows = dbRow(
-			"SELECT * FROM `server`
-			 WHERE `serverid` = '" . $serverid . "'
-			   AND `clientid` = '" . $clientId . "'
-			 LIMIT 1"
-		);
+		$rows = serverForClient((int) $clientId, (int) $serverid);
 
 		if (!is_array($rows) || empty($rows)) {
 			$_SESSION["msg1"] = "Server Error!";

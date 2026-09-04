@@ -19,21 +19,17 @@ if ($serverid === "" || $clientId === "") {
 	exit;
 }
 
-// Main server row
-$srv = dbRow(
-	"SELECT *
-	 FROM `server`
-	 WHERE `serverid` = '" . $serverid . "'
-	   AND `clientid` = '" . $clientId . "'
-	 LIMIT 1"
-);
+// Main server row — owner or shared (subuser).
+require __DIR__ . "/includes/access.php";
+$srv = serverForClient((int) $clientId, (int) $serverid);
 
 if (!is_array($srv) || empty($srv)) {
 	$_SESSION["msg1"] = "Server Error!";
 	$_SESSION["msg2"] = "Server not found.";
-	header("Location: servers.php");
+	header("Location: server.php");
 	exit;
 }
+$isOwner = !empty($srv["is_owner"]);
 
 $query = null;
 

@@ -1,8 +1,9 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
 <?php
-// expects: $srv (array), $query (array|null), $e_msg1, $e_msg2
-$srv    = $srv ?? [];
-$sid    = (int)($srv['serverid'] ?? 0);
+// expects: $srv (array), $query (array|null), $e_msg1, $e_msg2, $isOwner
+$srv     = $srv ?? [];
+$isOwner = $isOwner ?? true;
+$sid     = (int)($srv['serverid'] ?? 0);
 $online = $srv['online'] ?? '';
 $status = $srv['status'] ?? '';
 
@@ -41,14 +42,20 @@ for ($i = 1; $i <= 8; $i++) {
 			<a class="fp-btn fp-btn-stop" href="servermanage.php?task=stop&amp;serverid=<?= $sid ?>">&#9632; Stop</a>
 		<?php endif; ?>
 
-		<?php if (!empty($srv['webftp'])): ?>
-			<a class="fp-btn fp-btn-ghost" href="serverftp.php?id=<?= $sid ?>">Web FTP</a>
-		<?php endif; ?>
 		<a class="fp-btn fp-btn-ghost" href="serverplayers.php?id=<?= $sid ?>">Players</a>
-		<a class="fp-btn fp-btn-ghost" href="serverschedule.php?id=<?= $sid ?>">Schedules</a>
-		<a class="fp-btn fp-btn-ghost" href="serverbackup.php?id=<?= $sid ?>">Backups</a>
+		<?php if ($isOwner): ?>
+			<?php if (!empty($srv['webftp'])): ?>
+				<a class="fp-btn fp-btn-ghost" href="serverftp.php?id=<?= $sid ?>">Web FTP</a>
+			<?php endif; ?>
+			<a class="fp-btn fp-btn-ghost" href="serverschedule.php?id=<?= $sid ?>">Schedules</a>
+			<a class="fp-btn fp-btn-ghost" href="serverbackup.php?id=<?= $sid ?>">Backups</a>
+			<a class="fp-btn fp-btn-ghost" href="serversubusers.php?id=<?= $sid ?>">Share</a>
+		<?php endif; ?>
 	</div>
 </section>
+<?php if (!$isOwner): ?>
+	<div class="fp-note fp-note-ok"><strong>Shared with you</strong><span>You can view this server, use the console and start/stop it.</span></div>
+<?php endif; ?>
 
 <div class="fp-grid fp-grid-2">
 	<div class="fp-col">
@@ -73,7 +80,7 @@ for ($i = 1; $i <= 8; $i++) {
 
 			<div class="fp-card-head"><h2>Server configuration</h2></div>
 			<dl class="fp-dl">
-				<dt>Name</dt><dd><input type="text" name="name" value="<?= htmlspecialchars($srv['name'] ?? '') ?>"></dd>
+				<dt>Name</dt><dd><?php if ($isOwner): ?><input type="text" name="name" value="<?= htmlspecialchars($srv['name'] ?? '') ?>"><?php else: ?><?= htmlspecialchars($srv['name'] ?? '') ?><?php endif; ?></dd>
 				<dt>Max slots</dt><dd><?= htmlspecialchars((string)($srv['slots'] ?? '')) ?></dd>
 				<dt>Type</dt><dd><?= htmlspecialchars($srv['type'] ?? '') ?></dd>
 
@@ -91,10 +98,12 @@ for ($i = 1; $i <= 8; $i++) {
 				<?php endfor; ?>
 			</dl>
 
+			<?php if ($isOwner): ?>
 			<div class="fp-form-actions">
 				<button type="submit" class="fp-btn">Save changes</button>
 				<button type="reset" class="fp-btn fp-btn-ghost">Cancel</button>
 			</div>
+			<?php endif; ?>
 		</form>
 	</div>
 
@@ -121,7 +130,7 @@ for ($i = 1; $i <= 8; $i++) {
 			</dl>
 		</div>
 
-		<?php if (!empty($srv['showftp']) && !empty($srv['ip'])): ?>
+		<?php if (!empty($srv['showftp']) && !empty($srv['ip']) && $isOwner): ?>
 			<div class="fp-card">
 				<div class="fp-card-head"><h2>FTP details</h2></div>
 				<dl class="fp-dl">
@@ -132,7 +141,7 @@ for ($i = 1; $i <= 8; $i++) {
 			</div>
 		<?php endif; ?>
 
-		<?php if (!empty($srv['ipid'])): ?>
+		<?php if (!empty($srv['ipid']) && $isOwner): ?>
 			<?php
 			$fdlToken = (string) ($srv['fastdl'] ?? '');
 			$fdlBase  = rtrim(preg_replace('~/[^/]*$~', '', (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');

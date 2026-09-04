@@ -1,6 +1,7 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
 <?php
-// expects: $e_msg1, $e_msg2, $srv (array), $query (array)
+// expects: $e_msg1, $e_msg2, $srv (array), $query (array), $isOwner
+$isOwner = $isOwner ?? true;
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" class="title">
   <tr>
@@ -36,20 +37,25 @@
 	</td>
 
 	  <td align="right">
-		<?php if (!empty($srv['webftp'])): ?>
-		<input type="button" value="Web FTP"
-		  onclick="window.location='serverftp.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
-		  class="button blue" />
-		<?php endif; ?>
 		<input type="button" value="Players"
 		  onclick="window.location='serverplayers.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
 		  class="button blue" />
-		<input type="button" value="Schedules"
-		  onclick="window.location='serverschedule.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
-		  class="button blue" />
-		<input type="button" value="Backups"
-		  onclick="window.location='serverbackup.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
-		  class="button blue" />
+		<?php if ($isOwner): ?>
+		  <?php if (!empty($srv['webftp'])): ?>
+		  <input type="button" value="Web FTP"
+			onclick="window.location='serverftp.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+			class="button blue" />
+		  <?php endif; ?>
+		  <input type="button" value="Schedules"
+			onclick="window.location='serverschedule.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+			class="button blue" />
+		  <input type="button" value="Backups"
+			onclick="window.location='serverbackup.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+			class="button blue" />
+		  <input type="button" value="Share"
+			onclick="window.location='serversubusers.php?id=<?= (int)($srv['serverid'] ?? 0) ?>'"
+			class="button blue" />
+		<?php endif; ?>
 	  </td>
   </tr>
 </table>
@@ -103,7 +109,7 @@ $anyEditable =
 		<fieldset>
 		  <table width="100%" border="0" cellpadding="2" cellspacing="2">
 			<tr><td colspan="2" class="fieldheader">Server Configuration</td></tr>
-			<tr><td class="fieldname" style="height:20px;width:110px;">Name</td><td class="fieldarea"><input type="text" name="name" class="text" size="30" value="<?= htmlspecialchars($srv['name'] ?? '') ?>" /></td></tr>
+			<tr><td class="fieldname" style="height:20px;width:110px;">Name</td><td class="fieldarea"><?php if ($isOwner): ?><input type="text" name="name" class="text" size="30" value="<?= htmlspecialchars($srv['name'] ?? '') ?>" /><?php else: ?><?= htmlspecialchars($srv['name'] ?? '') ?><?php endif; ?></td></tr>
 			<tr><td class="fieldname" style="height:20px;">Max Slots</td><td class="fieldarea"><?= htmlspecialchars((string)($srv['slots'] ?? '')) ?></td></tr>
 			<tr><td class="fieldname" style="height:20px;">Type</td><td class="fieldarea"><?= htmlspecialchars($srv['type'] ?? '') ?></td></tr>
 
@@ -127,16 +133,18 @@ $anyEditable =
 		  </table>
 		</fieldset>
 
+		  <?php if ($isOwner): ?>
 		  <img src="templates/<?= htmlspecialchars(TEMPLATE) ?>/images/spacer.gif" height="6" width="1" alt="" /><br />
 		  <div align="center">
 			<input type="submit" value="Save Changes" class="button green" />
 			<input type="reset" value="Cancel Changes" class="button red" />
 		  </div>
+		  <?php endif; ?>
 	  </form>
 	</td>
 
 	<td width="50%" valign="top">
-	  <?php if (!empty($srv['showftp']) && !empty($srv['ip'])): ?>
+	  <?php if (!empty($srv['showftp']) && !empty($srv['ip']) && $isOwner): ?>
 	  <fieldset>
 		<table width="100%" border="0" cellpadding="2" cellspacing="2">
 		  <tr><td colspan="2" class="fieldheader">FTP Details</td></tr>
@@ -179,7 +187,7 @@ $anyEditable =
 		</table>
 	  </fieldset>
 
-	  <?php if (!empty($srv['ipid'])): ?>
+	  <?php if (!empty($srv['ipid']) && $isOwner): ?>
 	  <?php
 		$fdlToken = (string)($srv['fastdl'] ?? '');
 		$fdlBase  = rtrim(preg_replace('~/[^/]*$~', '', ((($_SERVER['REQUEST_SCHEME'] ?? 'http')) . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');

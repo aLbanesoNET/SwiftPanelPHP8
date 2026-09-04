@@ -253,6 +253,24 @@ CREATE TABLE IF NOT EXISTS `apikey` (
   KEY `tokenhash` (`tokenhash`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subuser` (server sharing)
+--
+
+CREATE TABLE IF NOT EXISTS `subuser` (
+  `subid` int(10) unsigned NOT NULL auto_increment,
+  `serverid` int(10) unsigned NOT NULL,
+  `ownerid` int(10) unsigned NOT NULL,
+  `subclientid` int(10) unsigned NOT NULL default '0',
+  `subemail` text NOT NULL,
+  `created` datetime default NULL,
+  PRIMARY KEY  (`subid`),
+  KEY `serverid` (`serverid`),
+  KEY `subclientid` (`subclientid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 --
 -- Dumping data for table `config`
 --

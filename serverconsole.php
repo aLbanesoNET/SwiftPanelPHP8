@@ -6,6 +6,7 @@ $return = true;
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
 require __DIR__ . '/includes/console.php';
+require __DIR__ . '/includes/access.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -18,13 +19,7 @@ if ($serverid <= 0 || $clientid <= 0) {
 	exit;
 }
 
-$server = dbRow(
-	"SELECT `serverid`, `boxid`, `user`, `password`, `online`
-	 FROM `server`
-	 WHERE `serverid` = '{$serverid}' AND `clientid` = '{$clientid}'
-	 LIMIT 1",
-	true
-);
+$server = serverForClient($clientid, $serverid);
 
 if (!$server) {
 	echo json_encode(['ok' => false, 'error' => 'Server not found.']);
