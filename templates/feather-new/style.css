@@ -64,11 +64,13 @@
     -webkit-font-smoothing: antialiased;
 }
 
+/* Light palette — applied when the OS prefers light (and the user has not
+   forced dark), or when the in-panel toggle sets data-theme="light". */
 @media (prefers-color-scheme: light)
 {
-    :root
+    :root:not([data-theme="dark"]) { color-scheme: light; }
+    :root:not([data-theme="dark"])
     {
-        color-scheme: light;
         --bg: #eef2ec;
         --bg-1: #e7ede4;
         --panel: #ffffff;
@@ -89,6 +91,30 @@
         --sh-2: 0 1px 2px #1b3a2514, 0 14px 34px -18px #1b3a2530;
         --sh-3: 0 30px 60px -26px #1b3a2540;
     }
+}
+
+:root[data-theme="light"]
+{
+    color-scheme: light;
+    --bg: #eef2ec;
+    --bg-1: #e7ede4;
+    --panel: #ffffff;
+    --panel-2: #ffffff;
+    --hi: #12331b0a;
+    --hi-2: #12331b12;
+    --line: #12331b26;
+    --line-soft: #12331b12;
+    --line-strong: #12331b40;
+    --text: #14261a;
+    --text-soft: #3a4b3f;
+    --muted: #5e6f60;
+    --faint: #93a394;
+    --accent: #15803d;
+    --accent-2: #166534;
+    --accent-deep: #14532d;
+    --accent-ink: #ffffff;
+    --sh-2: 0 1px 2px #1b3a2514, 0 14px 34px -18px #1b3a2530;
+    --sh-3: 0 30px 60px -26px #1b3a2540;
 }
 
 /* ---- Base ---------------------------------------------------------- */
@@ -257,6 +283,31 @@ h1, h2, h3 { margin: 0; color: var(--text); }
     white-space: nowrap;
 }
 #time::before { color: var(--accent-deep); content: "$ "; }
+
+#themetoggle
+{
+    margin: 8px 8px 0;
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--muted);
+    font: 600 10px/1 var(--mono);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+#themetoggle:hover { color: var(--text); background: var(--hi); }
+#themetoggle .tt-light { display: none; }
+:root[data-theme="light"] #themetoggle .tt-light { display: inline; }
+:root[data-theme="light"] #themetoggle .tt-dark { display: none; }
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) #themetoggle .tt-light { display: inline; }
+    :root:not([data-theme="dark"]) #themetoggle .tt-dark { display: none; }
+}
 
 /* ---- Shell: top bar + canvas ---------------------------------- */
 

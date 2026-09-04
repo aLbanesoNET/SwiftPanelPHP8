@@ -17,6 +17,7 @@ $navItem = static function (string $href, string $key, string $label, string $ac
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= htmlspecialchars($SITE_TITLE) ?></title>
+<script>try{var t=localStorage.getItem('fn-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="stylesheet" href="templates/feather-new/style.css?v=<?= @filemtime(__DIR__ . '/style.css') ?: '1' ?>">
 </head>
 <body class="<?= $LOGGED_IN ? 'app' : 'auth' ?>">
@@ -49,7 +50,18 @@ $navItem = static function (string $href, string $key, string $label, string $ac
 	</nav>
 
 	<div id="time"><?= date('D d M') ?> &middot; <?= date('H:i') ?></div>
+	<button type="button" id="themetoggle" onclick="fnToggleTheme()" title="Toggle light / dark">
+		<span class="tt-dark">&#9789;</span><span class="tt-light">&#9788;</span> <span class="tt-label">Theme</span>
+	</button>
 </aside>
+<script>
+function fnToggleTheme(){
+	var r=document.documentElement,cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+	var next=cur==='dark'?'light':'dark';
+	r.dataset.theme=next;
+	try{localStorage.setItem('fn-theme',next);}catch(e){}
+}
+</script>
 
 <div id="page">
 	<header id="topbar">
