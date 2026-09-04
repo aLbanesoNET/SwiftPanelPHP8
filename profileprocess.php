@@ -17,13 +17,31 @@ if ($task === "2fa_enable") {
 	$secret = (string) ($_SESSION["2fa_setup"] ?? "");
 	$code   = sanitizeInput($_POST["totpcode"] ?? "");
 	if ($secret !== "" && totpVerify($secret, $code)) {
-		dbExec("UPDATE `client` SET `totp` = '" . dbEscape($secret) . "' WHERE `clientid` = '" . $clientId . "'");
+		$plain = totpRecoveryCodes(8);
+		dbExec("UPDATE `client` SET `totp` = '" . dbEscape($secret) . "', `totp_recovery` = '" . dbEscape(totpRecoveryStore($plain)) . "' WHERE `clientid` = '" . $clientId . "'");
 		unset($_SESSION["2fa_setup"]);
+		$_SESSION["2fa_codes"] = $plain;
 		$_SESSION["msg1"] = "Two-factor enabled";
-		$_SESSION["msg2"] = "You will be asked for a code at your next sign in.";
+		$_SESSION["msg2"] = "Save your recovery codes below — each works once if you lose your app.";
 	} else {
 		$_SESSION["msg1"] = "Could not enable two-factor";
 		$_SESSION["msg2"] = "That code did not match. Try again with the current code.";
+	}
+	header("Location: profile.php");
+	exit;
+}
+
+if ($task === "2fa_regen") {
+	$cur = dbRow("SELECT `totp` FROM `client` WHERE `clientid` = '" . $clientId . "' LIMIT 1", true);
+	if (is_array($cur) && !empty($cur["totp"]) && totpVerify((string) $cur["totp"], sanitizeInput($_POST["totpcode"] ?? ""))) {
+		$plain = totpRecoveryCodes(8);
+		dbExec("UPDATE `client` SET `totp_recovery` = '" . dbEscape(totpRecoveryStore($plain)) . "' WHERE `clientid` = '" . $clientId . "'");
+		$_SESSION["2fa_codes"] = $plain;
+		$_SESSION["msg1"] = "New recovery codes";
+		$_SESSION["msg2"] = "The old codes no longer work.";
+	} else {
+		$_SESSION["msg1"] = "Could not regenerate";
+		$_SESSION["msg2"] = "Enter a current authenticator code to confirm.";
 	}
 	header("Location: profile.php");
 	exit;

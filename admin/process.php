@@ -32,9 +32,16 @@ switch ($task) {
 		$code = sanitizeInput($_POST["totpcode"] ?? "");
 		$aid  = (int) ($_SESSION["a2fa_id"] ?? 0);
 		if ($aid <= 0) { header("Location: login.php"); exit; }
-		$rows = dbRow("SELECT `adminid`, `username`, `firstname`, `lastname`, `password`, `totp` FROM `admin` WHERE `adminid` = '" . $aid . "' LIMIT 1", TRUE);
-		if ($rows && !empty($rows["totp"]) && totpVerify((string) $rows["totp"], $code)) {
-			adminCompleteLogin($rows, (string) ($_SESSION["a2fa_return"] ?? ""), (string) ($_SESSION["a2fa_remember"] ?? ""));
+		$rows = dbRow("SELECT `adminid`, `username`, `firstname`, `lastname`, `password`, `totp`, `totp_recovery` FROM `admin` WHERE `adminid` = '" . $aid . "' LIMIT 1", TRUE);
+		if ($rows && !empty($rows["totp"])) {
+			if (totpVerify((string) $rows["totp"], $code)) {
+				adminCompleteLogin($rows, (string) ($_SESSION["a2fa_return"] ?? ""), (string) ($_SESSION["a2fa_remember"] ?? ""));
+			}
+			$newRec = totpRecoveryConsume((string) ($rows["totp_recovery"] ?? ""), $code);
+			if ($newRec !== null) {
+				dbExec("UPDATE `admin` SET `totp_recovery` = '" . dbEscape($newRec) . "' WHERE `adminid` = '" . (int) $rows["adminid"] . "'");
+				adminCompleteLogin($rows, (string) ($_SESSION["a2fa_return"] ?? ""), (string) ($_SESSION["a2fa_remember"] ?? ""));
+			}
 		}
 		$_SESSION["loginerror"] = TRUE;
 		header("Location: login.php?task=2fa");
@@ -127,10 +134,12 @@ switch ($task) {
 		$aid    = (int) ($_SESSION["adminid"] ?? 0);
 		$secret = (string) ($_SESSION["a2fa_setup"] ?? "");
 		if ($aid > 0 && $secret !== "" && totpVerify($secret, sanitizeInput($_POST["totpcode"] ?? ""))) {
-			dbExec("UPDATE `admin` SET `totp` = '" . dbEscape($secret) . "' WHERE `adminid` = '" . $aid . "'");
+			$plain = totpRecoveryCodes(8);
+			dbExec("UPDATE `admin` SET `totp` = '" . dbEscape($secret) . "', `totp_recovery` = '" . dbEscape(totpRecoveryStore($plain)) . "' WHERE `adminid` = '" . $aid . "'");
 			unset($_SESSION["a2fa_setup"]);
+			$_SESSION["a2fa_codes"] = $plain;
 			$_SESSION["msg1"] = "Two-factor enabled";
-			$_SESSION["msg2"] = "You will be asked for a code at your next sign in.";
+			$_SESSION["msg2"] = "Save your recovery codes below.";
 		} else {
 			$_SESSION["msg1"] = "Could not enable two-factor";
 			$_SESSION["msg2"] = "That code did not match.";

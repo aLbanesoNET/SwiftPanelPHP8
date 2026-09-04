@@ -64,8 +64,19 @@
 <fieldset>
   <table width="100%" border="0" cellpadding="2" cellspacing="2">
 	<tr><td colspan="2" class="fieldheader">Two-Factor Authentication (<?= !empty($totpEnabled) ? 'Enabled' : 'Disabled' ?>)</td></tr>
+	<?php if (!empty($totpNewCodes)): ?>
+	<tr><td colspan="2" class="fieldarea" style="background-color:#FCF9D2;">
+	  <strong>Recovery codes &mdash; save these now (each works once):</strong><br />
+	  <?php foreach ($totpNewCodes as $rc): ?><code><?= htmlspecialchars($rc) ?></code>&nbsp;&nbsp;<?php endforeach; ?>
+	</td></tr>
+	<?php endif; ?>
 	<?php if (!empty($totpEnabled)): ?>
-	<tr><td colspan="2" class="fieldarea">Your account asks for an authenticator code at sign in.
+	<tr><td colspan="2" class="fieldarea">Your account asks for an authenticator code at sign in. <strong><?= (int) $totpRecovery ?></strong> recovery code(s) left.
+	  <form method="post" action="profileprocess.php" style="margin-top:6px;">
+		<input type="hidden" name="task" value="2fa_regen" />
+		Current code: <input type="text" name="totpcode" class="text" size="8" maxlength="6" />
+		<input type="submit" value="New Recovery Codes" class="button" />
+	  </form>
 	  <form method="post" action="profileprocess.php" style="margin-top:6px;">
 		<input type="hidden" name="task" value="2fa_disable" />
 		Current code: <input type="text" name="totpcode" class="text" size="8" maxlength="6" />

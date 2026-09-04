@@ -89,6 +89,55 @@ function totpVerify(string $secret, string $code, int $window = 1, int $step = 3
 	return false;
 }
 
+/* ---- One-time recovery codes ---------------------------------------- */
+
+/** N fresh recovery codes in "xxxx-xxxx" form (plaintext — show once). */
+function totpRecoveryCodes(int $n = 8): array
+{
+	$codes = [];
+	for ($i = 0; $i < $n; $i++) {
+		$hex = bin2hex(random_bytes(4)); // 8 hex chars
+		$codes[] = substr($hex, 0, 4) . '-' . substr($hex, 4, 4);
+	}
+	return $codes;
+}
+
+function totpRecoveryHash(string $code): string
+{
+	return hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $code)));
+}
+
+/** JSON array of hashes for storage. */
+function totpRecoveryStore(array $plainCodes): string
+{
+	return json_encode(array_map('totpRecoveryHash', $plainCodes));
+}
+
+function totpRecoveryRemaining(string $stored): int
+{
+	$a = json_decode($stored ?: '[]', true);
+	return is_array($a) ? count($a) : 0;
+}
+
+/**
+ * If $input matches a stored recovery hash, return the new JSON string with
+ * that code removed (caller persists it). Otherwise null.
+ */
+function totpRecoveryConsume(string $stored, string $input): ?string
+{
+	$a = json_decode($stored ?: '[]', true);
+	if (!is_array($a) || $a === []) {
+		return null;
+	}
+	$h = totpRecoveryHash($input);
+	$idx = array_search($h, $a, true);
+	if ($idx === false) {
+		return null;
+	}
+	array_splice($a, (int) $idx, 1);
+	return json_encode(array_values($a));
+}
+
 /** otpauth:// URI for QR / manual entry. */
 function totpUri(string $secret, string $account, string $issuer): string
 {

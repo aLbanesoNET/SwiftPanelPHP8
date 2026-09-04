@@ -57,9 +57,16 @@ switch ($task) {
 			exit;
 		}
 
-		$user = dbRow("SELECT clientid,email,firstname,lastname,password,totp FROM client WHERE clientid='" . $pcid . "' LIMIT 1", true);
-		if (is_array($user) && !empty($user["totp"]) && totpVerify((string) $user["totp"], $code)) {
-			completeClientLogin($user, $return, (string) ($_SESSION["2fa_remember"] ?? ""), "2fa");
+		$user = dbRow("SELECT clientid,email,firstname,lastname,password,totp,totp_recovery FROM client WHERE clientid='" . $pcid . "' LIMIT 1", true);
+		if (is_array($user) && !empty($user["totp"])) {
+			if (totpVerify((string) $user["totp"], $code)) {
+				completeClientLogin($user, $return, (string) ($_SESSION["2fa_remember"] ?? ""), "2fa");
+			}
+			$newRecovery = totpRecoveryConsume((string) ($user["totp_recovery"] ?? ""), $code);
+			if ($newRecovery !== null) {
+				dbExec("UPDATE `client` SET `totp_recovery` = '" . dbEscape($newRecovery) . "' WHERE `clientid` = '" . (int) $user["clientid"] . "'");
+				completeClientLogin($user, $return, (string) ($_SESSION["2fa_remember"] ?? ""), "recovery");
+			}
 		}
 
 		$_SESSION["loginerror"] = true;

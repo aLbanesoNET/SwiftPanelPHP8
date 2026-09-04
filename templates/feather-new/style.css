@@ -798,6 +798,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 
 /* ---- Databases page ------------------------------- */
 
+.fp-recovery { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 6px 0 14px; }
+.fp-recovery code { padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--bg-1); text-align: center; font-family: var(--mono); }
+
 .fp-secret { color: var(--text-soft); letter-spacing: .15em; }
 .fp-reveal
 {

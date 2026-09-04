@@ -10,6 +10,9 @@ require "../includes/totp.php";
 $rows = dbRow("SELECT * FROM `admin` WHERE `adminid` = '" . $_SESSION["adminid"] . "' LIMIT 1");
 
 $totpEnabled = !empty($rows["totp"]);
+$totpRecovery = totpRecoveryRemaining((string) ($rows["totp_recovery"] ?? ""));
+$totpNewCodes = $_SESSION["a2fa_codes"] ?? [];
+unset($_SESSION["a2fa_codes"]);
 $totpSetup = "";
 $totpUri = "";
 if (!$totpEnabled) {
@@ -42,8 +45,12 @@ renderForm($form);
 <fieldset>
   <table width="100%" border="0" cellpadding="2" cellspacing="2">
 	<tr><td colspan="2" class="fieldheader">Two-Factor Authentication (<?= $totpEnabled ? "Enabled" : "Disabled" ?>)</td></tr>
+	<?php if (!empty($totpNewCodes)): ?>
+	<tr><td colspan="2" class="fieldarea" style="background-color:#FCF9D2;"><strong>Recovery codes &mdash; save these now (each works once):</strong><br />
+	  <?php foreach ($totpNewCodes as $rc): ?><code><?= htmlspecialchars($rc) ?></code>&nbsp;&nbsp;<?php endforeach; ?></td></tr>
+	<?php endif; ?>
 	<?php if ($totpEnabled): ?>
-	<tr><td colspan="2" class="fieldarea">Your admin login asks for an authenticator code.
+	<tr><td colspan="2" class="fieldarea">Your admin login asks for an authenticator code. <strong><?= (int) $totpRecovery ?></strong> recovery code(s) left.
 	  <form method="post" action="process.php" style="margin-top:6px;">
 		<input type="hidden" name="task" value="2fa_disable" />
 		Current code: <input type="text" name="totpcode" class="text" size="8" maxlength="6" />

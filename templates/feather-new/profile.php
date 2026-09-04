@@ -48,8 +48,23 @@
 		<span class="fp-pill <?= !empty($totpEnabled) ? 'fp-pill-ok' : 'fp-pill-mono' ?>"><?= !empty($totpEnabled) ? 'On' : 'Off' ?></span>
 	</div>
 
+	<?php if (!empty($totpNewCodes)): ?>
+		<div class="fp-note fp-note-warn">
+			<strong>Recovery codes &mdash; save these now</strong>
+			<span>Each works once. This is the only time they are shown.</span>
+		</div>
+		<div class="fp-recovery">
+			<?php foreach ($totpNewCodes as $rc): ?><code><?= htmlspecialchars($rc) ?></code><?php endforeach; ?>
+		</div>
+	<?php endif; ?>
+
 	<?php if (!empty($totpEnabled)): ?>
-		<p>Your account asks for an authenticator code at sign in.</p>
+		<p>Your account asks for an authenticator code at sign in. <strong><?= (int) $totpRecovery ?></strong> recovery code<?= (int) $totpRecovery === 1 ? '' : 's' ?> left.</p>
+		<form method="post" action="profileprocess.php" style="margin-bottom:14px;">
+			<input type="hidden" name="task" value="2fa_regen">
+			<label class="fp-field"><span>Current code &mdash; to get new recovery codes</span><input type="text" name="totpcode" inputmode="numeric" maxlength="6"></label>
+			<div class="fp-form-actions"><button type="submit" class="fp-btn fp-btn-ghost">Regenerate recovery codes</button></div>
+		</form>
 		<form method="post" action="profileprocess.php">
 			<input type="hidden" name="task" value="2fa_disable">
 			<label class="fp-field"><span>Current code &mdash; to confirm</span><input type="text" name="totpcode" inputmode="numeric" maxlength="6"></label>

@@ -16,8 +16,8 @@ $task = $task ?? '';
 		<form action="process.php" method="post" class="fp-auth-form">
 			<input type="hidden" name="task" value="login2fa">
 			<label class="fp-field">
-				<span>Authenticator code</span>
-				<input type="text" name="totpcode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" autofocus>
+				<span>Authenticator or recovery code</span>
+				<input type="text" name="totpcode" autocomplete="one-time-code" maxlength="9" autofocus>
 			</label>
 			<button type="submit" class="fp-btn fp-btn-full">Verify</button>
 		</form>

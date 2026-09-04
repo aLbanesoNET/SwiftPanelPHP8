@@ -18,7 +18,10 @@ $lastname  = $client["lastname"];
 $email	 = $client["email"];
 $password  = "";
 
-$totpEnabled = !empty($client["totp"]);
+$totpEnabled   = !empty($client["totp"]);
+$totpRecovery  = totpRecoveryRemaining((string) ($client["totp_recovery"] ?? ''));
+$totpNewCodes  = $_SESSION['2fa_codes'] ?? [];
+unset($_SESSION['2fa_codes']);
 $totpSetup   = '';
 $totpUri     = '';
 if (!$totpEnabled) {
