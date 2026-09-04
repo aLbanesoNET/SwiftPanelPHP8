@@ -17,9 +17,28 @@ $success = $_SESSION["success"] ?? "";
 if ($success === "No") {
 	unset($_SESSION["success"]);
 }
+$twofa = ($task === "2fa" && !empty($_SESSION["a2fa_id"]));
+if ($task === "2fa" && empty($_SESSION["a2fa_id"])) {
+	header("Location: login.php");
+	exit;
+}
 include "./templates/" . TEMPLATE . "/header.php";
 ?>
-<?php if ($lockout): ?>
+<?php if ($twofa): ?>
+<div align="center">
+  <?php if ($loginError): ?>
+	<div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;"><strong>Wrong or expired code.</strong><br />Enter the current 6-digit code from your authenticator app.</div><br />
+  <?php endif; ?>
+  <form action="process.php" method="post">
+	<input type="hidden" name="task" value="login2fa" />
+	<table border="0" cellpadding="0" cellspacing="10">
+	  <tr><td align="right">Code:</td><td><input type="text" name="totpcode" class="text" size="12" maxlength="6" autocomplete="one-time-code" autofocus /></td></tr>
+	  <tr><td colspan="2" align="center"><input type="submit" value="Verify" class="button" /></td></tr>
+	</table>
+  </form>
+  <br /><a href="login.php">Cancel</a>
+</div>
+<?php elseif ($lockout): ?>
 <div align="center">
 <div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;"><strong>Too Many Incorrect Login Attempts</strong><br />
 	  Please wait 10 minutes before trying again.</div>

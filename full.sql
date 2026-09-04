@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `lastlogin` text NOT NULL,
   `lastip` text NOT NULL,
   `lasthost` text NOT NULL,
+  `totp` varchar(64) NOT NULL default '',
   PRIMARY KEY  (`adminid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 

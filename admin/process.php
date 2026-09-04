@@ -1,15 +1,45 @@
 <?php
 $postTask = $_POST["task"] ?? "";
-if($postTask != "login" && $postTask != "password" && $postTask != "logout") {
+if($postTask != "login" && $postTask != "login2fa" && $postTask != "password" && $postTask != "logout") {
 	$return = TRUE;
 }
 require "../configuration.php";
 require "./include.php";
+require "../includes/totp.php";
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
 	$task = sanitizeInput($_GET["task"] ?? "");
 }
+function adminCompleteLogin(array $rows, string $return, string $rememberme): void
+{
+	dbExec("UPDATE `admin` SET `lastlogin` = NOW(), `lastip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "', `lasthost` = '" . dbEscape((string) @gethostbyaddr($_SERVER["REMOTE_ADDR"] ?? "")) . "' WHERE `adminid` = '" . (int) $rows["adminid"] . "'");
+	$_SESSION["adminid"] = $rows["adminid"];
+	$_SESSION["adminusername"] = $rows["username"];
+	$_SESSION["adminfirstname"] = $rows["firstname"];
+	$_SESSION["adminlastname"] = $rows["lastname"];
+	if ($rememberme == "on") {
+		setcookie("adminusername", $rows["username"], time() + 60 * 60 * 24 * 30);
+	} else {
+		setcookie("adminusername", "", time() + 60 * 60 * 24 * 1);
+	}
+	unset($_SESSION["loginattempt"], $_SESSION["lockout"], $_SESSION["a2fa_id"], $_SESSION["a2fa_return"], $_SESSION["a2fa_remember"]);
+	header("Location: " . (!empty($return) ? $return : "index.php"));
+	exit;
+}
+
 switch ($task) {
+	case "login2fa":
+		$code = sanitizeInput($_POST["totpcode"] ?? "");
+		$aid  = (int) ($_SESSION["a2fa_id"] ?? 0);
+		if ($aid <= 0) { header("Location: login.php"); exit; }
+		$rows = dbRow("SELECT `adminid`, `username`, `firstname`, `lastname`, `password`, `totp` FROM `admin` WHERE `adminid` = '" . $aid . "' LIMIT 1", TRUE);
+		if ($rows && !empty($rows["totp"]) && totpVerify((string) $rows["totp"], $code)) {
+			adminCompleteLogin($rows, (string) ($_SESSION["a2fa_return"] ?? ""), (string) ($_SESSION["a2fa_remember"] ?? ""));
+		}
+		$_SESSION["loginerror"] = TRUE;
+		header("Location: login.php?task=2fa");
+		exit;
+
 	case "login":
 		$username = sanitizeInput($_POST["username"] ?? "");
 		$password = sanitizeInput($_POST["password"] ?? "");
@@ -19,30 +49,20 @@ switch ($task) {
 		setcookie("rememberme", $rememberme, time() + 60 * 60 * 24 * 30);
 		if(!empty($_SESSION["lockout"]) && time() - 60 * 10 < $_SESSION["lockout"]) {
 		} elseif(!empty($username) && !empty($password)) {
-			$rows = dbRow("SELECT `adminid`, `username`, `firstname`, `lastname`, `password` FROM `admin` WHERE `username` = '" . $username . "' AND `status` = 'Active' LIMIT 1", TRUE);
+			$rows = dbRow("SELECT `adminid`, `username`, `firstname`, `lastname`, `password`, `totp` FROM `admin` WHERE `username` = '" . $username . "' AND `status` = 'Active' LIMIT 1", TRUE);
 			if($rows && verifyPassword($password, $rows["password"])) {
 				if(passwordNeedsRehash($rows["password"])) {
 					$rehashed = hashPassword($password);
 					dbExec("UPDATE `admin` SET `password` = '" . $rehashed . "' WHERE `adminid` = '" . $rows["adminid"] . "'");
 				}
-				dbExec("UPDATE `admin` SET `lastlogin` = NOW(), `lastip` = '" . $_SERVER["REMOTE_ADDR"] . "', `lasthost` = '" . gethostbyaddr($_SERVER["REMOTE_ADDR"]) . "' WHERE `adminid` = '" . $rows["adminid"] . "'");
-				$_SESSION["adminid"] = $rows["adminid"];
-				$_SESSION["adminusername"] = $rows["username"];
-				$_SESSION["adminfirstname"] = $rows["firstname"];
-				$_SESSION["adminlastname"] = $rows["lastname"];
-				if($rememberme == "on") {
-					setcookie("adminusername", $rows["username"], time() + 60 * 60 * 24 * 30);
-				} else {
-					setcookie("adminusername", "", time() + 60 * 60 * 24 * 1);
+				if (!empty($rows["totp"])) {
+					$_SESSION["a2fa_id"]       = (int) $rows["adminid"];
+					$_SESSION["a2fa_return"]   = $return;
+					$_SESSION["a2fa_remember"] = $rememberme;
+					header("Location: login.php?task=2fa");
+					exit;
 				}
-				unset($_SESSION["loginattempt"]);
-				unset($_SESSION["lockout"]);
-				if(!empty($return)) {
-					header("Location: " . $return);
-				} else {
-					header("Location: index.php");
-				}
-				exit;
+				adminCompleteLogin($rows, $return, $rememberme);
 			}
 		}
 		$_SESSION["loginerror"] = TRUE;
@@ -102,6 +122,36 @@ switch ($task) {
 		}
 		header("Location: login.php?task=password");
 		exit;
+
+	case "2fa_enable":
+		$aid    = (int) ($_SESSION["adminid"] ?? 0);
+		$secret = (string) ($_SESSION["a2fa_setup"] ?? "");
+		if ($aid > 0 && $secret !== "" && totpVerify($secret, sanitizeInput($_POST["totpcode"] ?? ""))) {
+			dbExec("UPDATE `admin` SET `totp` = '" . dbEscape($secret) . "' WHERE `adminid` = '" . $aid . "'");
+			unset($_SESSION["a2fa_setup"]);
+			$_SESSION["msg1"] = "Two-factor enabled";
+			$_SESSION["msg2"] = "You will be asked for a code at your next sign in.";
+		} else {
+			$_SESSION["msg1"] = "Could not enable two-factor";
+			$_SESSION["msg2"] = "That code did not match.";
+		}
+		header("Location: myaccount.php");
+		exit;
+
+	case "2fa_disable":
+		$aid = (int) ($_SESSION["adminid"] ?? 0);
+		$cur = dbRow("SELECT `totp` FROM `admin` WHERE `adminid` = '" . $aid . "' LIMIT 1", TRUE);
+		if ($aid > 0 && is_array($cur) && !empty($cur["totp"]) && totpVerify((string) $cur["totp"], sanitizeInput($_POST["totpcode"] ?? ""))) {
+			dbExec("UPDATE `admin` SET `totp` = '' WHERE `adminid` = '" . $aid . "'");
+			$_SESSION["msg1"] = "Two-factor disabled";
+			$_SESSION["msg2"] = "Your account no longer requires a code.";
+		} else {
+			$_SESSION["msg1"] = "Could not disable two-factor";
+			$_SESSION["msg2"] = "Enter a current code to confirm.";
+		}
+		header("Location: myaccount.php");
+		exit;
+
 	case "myaccount":
 		$adminid = sanitizeInput($_POST["adminid"] ?? "");
 		$firstname = sanitizeInput($_POST["firstname"] ?? "");
