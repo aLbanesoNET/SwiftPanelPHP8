@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 require "../includes/screenctl.php";
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
@@ -48,8 +49,8 @@ switch ($task) {
 		sshExec($sshconnection, screenKillCommand($sessionName, $task == "stop" ? (string) $rows["user"] : ""));
 		dbExec("UPDATE `server` SET `online` = 'Stopped' WHERE `serverid` = '" . $serverid . "'");
 		if($task == "stop") {
-			$message = "Server Stopped: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows["name"] . "</a> (Admin)";
-			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+			$message = "Server Stopped: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($rows["name"]) . "</a> (Admin)";
+			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 			$_SESSION["msg1"] = "Server Stopped Successfully!";
 			$_SESSION["msg2"] = "The server has been stopped.";
 			if(!empty($return)) {
@@ -98,13 +99,13 @@ switch ($task) {
 		}
 		dbExec("UPDATE `server` SET `online` = 'Started' WHERE `serverid` = '" . $rows["serverid"] . "'");
 		if($task == "start") {
-			$message = "Server Started: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows["name"] . "</a> (Admin)";
-			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+			$message = "Server Started: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($rows["name"]) . "</a> (Admin)";
+			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 			$_SESSION["msg1"] = "Server Started Successfully!";
 			$_SESSION["msg2"] = "Allow 20 seconds for server status to show!";
 		} elseif($task == "restart") {
-			$message = "Server Restarted: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows["name"] . "</a> (Admin)";
-			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+			$message = "Server Restarted: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($rows["name"]) . "</a> (Admin)";
+			dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 			$_SESSION["msg1"] = "Server Restarted Successfully!";
 			$_SESSION["msg2"] = "Allow 20 seconds for server status to show!";
 		}

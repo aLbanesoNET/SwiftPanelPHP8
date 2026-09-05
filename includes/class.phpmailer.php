@@ -46,7 +46,7 @@ class PHPMailer
 		$headers = [];
 		if ($this->From !== '') {
 			$headers[] = 'From: ' . $this->formatAddress($this->From, $this->FromName);
-			$headers[] = 'Reply-To: ' . $this->From;
+			$headers[] = 'Reply-To: ' . $this->stripHeaderInjection($this->From);
 		}
 		if ($this->bcc) {
 			$headers[] = 'Bcc: ' . implode(', ', $this->bcc);
@@ -59,7 +59,7 @@ class PHPMailer
 
 		return @mail(
 			implode(', ', $this->to),
-			$this->encodeHeader($this->Subject),
+			$this->encodeHeader($this->stripHeaderInjection($this->Subject)),
 			$body,
 			implode("\r\n", $headers)
 		);
@@ -67,12 +67,18 @@ class PHPMailer
 
 	private function formatAddress(string $address, string $name = ''): string
 	{
-		$address = trim($address);
-		$name = trim($name);
+		$address = $this->stripHeaderInjection(trim($address));
+		$name = $this->stripHeaderInjection(trim($name));
 
 		return $name !== ''
 			? $this->encodeHeader($name) . ' <' . $address . '>'
 			: $address;
+	}
+
+	/** Drop CR/LF and other control bytes so a poisoned name/subject/address can't smuggle extra mail headers. */
+	private function stripHeaderInjection(string $value): string
+	{
+		return trim(preg_replace('/[\x00-\x1F\x7F]+/', ' ', $value) ?? '');
 	}
 
 	private function encodeHeader(string $value): string

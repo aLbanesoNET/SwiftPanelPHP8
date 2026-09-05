@@ -8,19 +8,14 @@ require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
 
 $task   = isset($_GET['task'])   ? sanitizeInput($_GET['task'] ?? "")   : '';
-$return = isset($_GET['return']) ? sanitizeInput($_GET['return'] ?? "") : '';
+$return = safeReturnPath($_GET['return'] ?? '');
 
-$email	= '';
-$password = '';
+$email = '';
 
 if (isset($_GET['email'])) {
 	$email = sanitizeInput($_GET['email'] ?? "");
 } elseif (isset($_COOKIE['clientemail'])) {
 	$email = sanitizeInput($_COOKIE['clientemail'] ?? "");
-}
-
-if (isset($_GET['password'])) {
-	$password = sanitizeInput($_GET['password'] ?? "");
 }
 
 $lockout = false;

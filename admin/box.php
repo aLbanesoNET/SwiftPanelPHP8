@@ -8,17 +8,17 @@ require "./include.php";
 $linkend = "";
 $dirImage = "";
 $status = "";
-$orderby = sanitizeInput($_GET["orderby"] ?? "");
-if(empty($orderby)) {
-	$orderby = "boxid";
-}
+$orderby = sqlSortColumn(sanitizeInput($_GET["orderby"] ?? ""), ["boxid", "name", "location", "ip"], "boxid");
 $dir = sanitizeInput($_GET["dir"] ?? "");
 if(empty($dir)) {
 	$dirImage = " <img src='templates/" . TEMPLATE . "/images/asc.png' align='bottom' alt='' />";
-} elseif($dir = "desc") {
+} elseif($dir === "desc") {
 	$dirImage = " <img src='templates/" . TEMPLATE . "/images/desc.png' align='bottom' alt='' />";
 }
 $search = sanitizeInput($_GET["search"] ?? "");
+if ($search !== "" && !in_array($search, ["boxid", "name", "location", "ip"], true)) {
+	$search = "name";
+}
 $q = sanitizeInput($_GET["q"] ?? "");
 if(!empty($q)) {
 	$linkend .= "&amp;search=" . $search . "&amp;q=" . $q;
@@ -48,7 +48,7 @@ if(!empty($q)) {
 }
 $query .= "ORDER BY `" . $orderby . "` ";
 if(!empty($dir)) {
-	$query .= $dir . " ";
+	$query .= sqlSortDir($dir) . " ";
 }
 $numrecords = dbCount($query);
 $numpages = ceil($numrecords / $rowsperpage);

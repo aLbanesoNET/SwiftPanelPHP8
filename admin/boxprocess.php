@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
 	$task = sanitizeInput($_GET["task"] ?? "");
@@ -109,7 +110,7 @@ switch ($task) {
 		dbExec("INSERT INTO `box` SET `name` = '" . $name . "', `location` = '" . $location . "', `ip` = '" . $ip . "', `login` = '" . $login . "', `password` = '" . @base64_encode($password) . "', `ftpport` = '" . $ftpport . "', `sshport` = '" . $sshport . "', `ostype` = '" . $ostype . "', `cost` = '" . $cost . "', `notes` = '" . $notes . "', `ftp` = 'Online', `ssh` = 'Online', `load` = '~', `idle` = '~', `passive` = 'On'");
 		$boxid = dbInsertId();
 		$message = "Box Added: <a href=\"boxsummary.php?id=" . $boxid . "\">" . $name . "</a>";
-		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Box Added Successfully!";
 		$_SESSION["msg2"] = "The box has been added and is ready for use.";
 		header("Location: boxsummary.php?id=" . urlencode($boxid));
@@ -219,7 +220,7 @@ switch ($task) {
 		unset($_SESSION["verify"]);
 		dbExec("UPDATE `box` SET `name` = '" . $name . "', `location` = '" . $location . "', `ip` = '" . $ip . "', `login` = '" . $login . "', `password` = '" . @base64_encode($password) . "', `ftpport` = '" . $ftpport . "', `sshport` = '" . $sshport . "', `ostype` = '" . $ostype . "', `cost` = '" . $cost . "', `passive` = '" . $passive . "', `notes` = '" . $notes . "' WHERE `boxid` = '" . $boxid . "'");
 		$message = "Box Edited: <a href=\"boxsummary.php?id=" . $boxid . "\">" . $name . "</a>";
-		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Box Updated Successfully!";
 		$_SESSION["msg2"] = "Your changes to the box have been saved.";
 		header("Location: boxsummary.php?id=" . urlencode($boxid));
@@ -246,8 +247,8 @@ switch ($task) {
 		}
 		$rows = dbRow("SELECT `name` FROM `box` WHERE `boxid` = '" . $boxid . "' LIMIT 1");
 		dbExec("DELETE FROM `box` WHERE `boxid` = '" . $boxid . "' LIMIT 1");
-		$message = "Box Deleted: " . $rows["name"];
-		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "Box Deleted: " . dbEscape($rows["name"]);
+		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Box Deleted Successfully!";
 		$_SESSION["msg2"] = "The selected box has been removed.";
 		header("Location: box.php");
@@ -297,8 +298,8 @@ switch ($task) {
 		unset($_SESSION["verify"]);
 		dbExec("INSERT INTO `ip` SET `boxid` = '" . $boxid . "', `ip` = '" . $ip . "', `usage` = '" . $usage . "'");
 		$rows1 = dbRow("SELECT `name` FROM `box` WHERE `boxid` = '" . $boxid . "' LIMIT 1");
-		$message = "IP Added: " . $ip . " to <a href=\"boxsummary.php?id=" . $boxid . "\">" . $rows1["name"] . "</a>";
-		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "IP Added: " . $ip . " to <a href=\"boxsummary.php?id=" . $boxid . "\">" . dbEscape($rows1["name"]) . "</a>";
+		dbExec("INSERT INTO `log` SET `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "IP Address Added Successfully!";
 		$_SESSION["msg2"] = "The IP address has been added and is ready for use.";
 		header("Location: boxsummary.php?id=" . urlencode($boxid));
@@ -327,8 +328,8 @@ switch ($task) {
 		}
 		dbExec("DELETE FROM `ip` WHERE `ipid` = '" . $ipid . "' LIMIT 1");
 		$rows1 = dbRow("SELECT `name` FROM `box` WHERE `boxid` = '" . $rows["boxid"] . "' LIMIT 1");
-		$message = "IP Deleted: " . $rows["ip"] . " from <a href=\"boxsummary.php?id=" . $rows["boxid"] . "\">" . $rows1["name"] . "</a>";
-		dbExec("INSERT INTO `log` SET `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "IP Deleted: " . dbEscape($rows["ip"]) . " from <a href=\"boxsummary.php?id=" . $rows["boxid"] . "\">" . dbEscape($rows1["name"]) . "</a>";
+		dbExec("INSERT INTO `log` SET `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "IP Address Deleted Successfully!";
 		$_SESSION["msg2"] = "The selected IP address has been removed.";
 		header("Location: boxsummary.php?id=" . urlencode($rows["boxid"]));

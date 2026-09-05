@@ -33,7 +33,7 @@
 				<span class="fp-srv-meta"><?= htmlspecialchars($p['time']) ?></span>
 				<span class="fp-srv-meta"><?= htmlspecialchars($p['ping']) ?></span>
 				<span class="fp-c-act">
-					<a class="fp-ibtn fp-ibtn-stop" href="serverplayersprocess.php?task=kick&amp;serverid=<?= $sid ?>&amp;name=<?= urlencode($p['name']) ?>" title="Kick" onclick="return confirm('Kick <?= htmlspecialchars($p['name'], ENT_QUOTES) ?>?');">&#215;</a>
+					<a class="fp-ibtn fp-ibtn-stop" href="serverplayersprocess.php?task=kick&amp;serverid=<?= $sid ?>&amp;name=<?= urlencode($p['name']) ?>" title="Kick" onclick="return confirm('Kick <?= htmlspecialchars(addslashes($p['name']), ENT_QUOTES) ?>?');">&#215;</a>
 				</span>
 			</div>
 		<?php endforeach; ?>

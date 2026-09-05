@@ -170,8 +170,8 @@ renderTabs($tabs, 1);
 			  <?php if($serverinfo): ?>
 			  <?php foreach ($serverinfo as $name => $value): ?>
 			  <tr>
-				<td class="fieldname" style="height:20px;"><?= $name ?></td>
-				<td class="fieldarea"><?= $value ?></td>
+				<td class="fieldname" style="height:20px;"><?= htmlspecialchars((string) $name, ENT_QUOTES, "UTF-8") ?></td>
+				<td class="fieldarea"><?= htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8") ?></td>
 			  </tr>
 			  <?php endforeach; ?>
 			  <?php endif; ?>

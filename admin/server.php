@@ -7,17 +7,17 @@ require "../configuration.php";
 require "./include.php";
 $linkend = "";
 $dirImage = "";
-$orderby = sanitizeInput($_GET["orderby"] ?? "");
-if(empty($orderby)) {
-	$orderby = "serverid";
-}
+$orderby = sqlSortColumn(sanitizeInput($_GET["orderby"] ?? ""), ["online", "serverid", "name", "game"], "serverid");
 $dir = sanitizeInput($_GET["dir"] ?? "");
 if(empty($dir)) {
 	$dirImage = " <img src='templates/" . TEMPLATE . "/images/asc.png' align='bottom' alt='' />";
-} elseif($dir = "desc") {
+} elseif($dir === "desc") {
 	$dirImage = " <img src='templates/" . TEMPLATE . "/images/desc.png' align='bottom' alt='' />";
 }
 $search = sanitizeInput($_GET["search"] ?? "");
+if ($search !== "" && !in_array($search, ["serverid", "clientid", "boxid", "name", "game"], true)) {
+	$search = "name";
+}
 $q = sanitizeInput($_GET["q"] ?? "");
 if(!empty($q)) {
 	$linkend .= "&amp;search=" . $search . "&amp;q=" . $q;
@@ -60,7 +60,7 @@ if(!empty($status)) {
 }
 $query .= "ORDER BY `" . $orderby . "` ";
 if(!empty($dir)) {
-	$query .= $dir . " ";
+	$query .= sqlSortDir($dir) . " ";
 }
 $numrecords = dbCount($query);
 $numpages = ceil($numrecords / $rowsperpage);
@@ -162,9 +162,9 @@ echo renderMessageBox();
 			$qryport = empty($rows["qryport"]) ? $rows["port"] : $rows["qryport"];
 			$serverinfo = querySingleServer(array($rows["query"], $rows1["ip"], $qryport));
 	  ?>
-	  <td style="line-height:13px;"><?php if(!empty($serverinfo["Server Name"]) || !empty($serverinfo["Current Map"])): ?><b><?= $serverinfo["Server Name"] ?? "" ?></b><br /><?= $serverinfo["Current Map"] ?? "" ?> ( <font color="#0000FF"><b><?= $serverinfo["Players"] ?? "" ?></b></font> Players <?php if(!empty($serverinfo["Bot Players"])): ?>/ <b><?= $serverinfo["Bot Players"] ?></b> Bots<?php endif; ?> <?php if(!empty($serverinfo["Max Players"])): ?>/ <font color="#DD0000"><b><?= $serverinfo["Max Players"] ?></b></font> Slots<?php endif; ?> )<br /><?php endif; ?><i><?= $rows1["ip"] ?><b>:</b><?= $rows["port"] ?></i></td>
+	  <td style="line-height:13px;"><?php if(!empty($serverinfo["Server Name"]) || !empty($serverinfo["Current Map"])): ?><b><?= htmlspecialchars((string) ($serverinfo["Server Name"] ?? ""), ENT_QUOTES, "UTF-8") ?></b><br /><?= htmlspecialchars((string) ($serverinfo["Current Map"] ?? ""), ENT_QUOTES, "UTF-8") ?> ( <font color="#0000FF"><b><?= htmlspecialchars((string) ($serverinfo["Players"] ?? ""), ENT_QUOTES, "UTF-8") ?></b></font> Players <?php if(!empty($serverinfo["Bot Players"])): ?>/ <b><?= htmlspecialchars((string) $serverinfo["Bot Players"], ENT_QUOTES, "UTF-8") ?></b> Bots<?php endif; ?> <?php if(!empty($serverinfo["Max Players"])): ?>/ <font color="#DD0000"><b><?= htmlspecialchars((string) $serverinfo["Max Players"], ENT_QUOTES, "UTF-8") ?></b></font> Slots<?php endif; ?> )<br /><?php endif; ?><i><?= htmlspecialchars((string) $rows1["ip"], ENT_QUOTES, "UTF-8") ?><b>:</b><?= (int) $rows["port"] ?></i></td>
 	  <?php else: ?>
-	  <td><i><?= $rows1["ip"] ?><b>:</b><?= $rows["port"] ?></i></td>
+	  <td><i><?= htmlspecialchars((string) $rows1["ip"], ENT_QUOTES, "UTF-8") ?><b>:</b><?= (int) $rows["port"] ?></i></td>
 	  <?php endif; ?>
 	  <td><?php if($rows["online"] == "Stopped"): ?>&nbsp;<a href="servermanage.php?task=start&amp;return=<?= urlencode($return) ?>&amp;serverid=<?= $rows["serverid"] ?>"><img src="templates/<?= TEMPLATE ?>/images/buttons/play.png" width="25" height="25" align="middle" alt="" /></a>&nbsp;<?php elseif($rows["online"] == "Started"): ?><a href="servermanage.php?task=restart&amp;return=<?= urlencode($return) ?>&amp;serverid=<?= $rows["serverid"] ?>"><img src="templates/<?= TEMPLATE ?>/images/buttons/refresh.png" width="25" height="25" align="middle" alt="" /></a> <a href="servermanage.php?task=stop&amp;return=<?= urlencode($return) ?>&amp;serverid=<?= $rows["serverid"] ?>"><img src="templates/<?= TEMPLATE ?>/images/buttons/stop.png" width="25" height="25" align="middle" alt="" /></a><?php endif; ?></td>
 	  <?php else: ?>

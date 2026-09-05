@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
 	$task = sanitizeInput($_GET["task"] ?? "");
@@ -89,7 +90,7 @@ switch ($task) {
 		dbExec("INSERT INTO `client` SET `firstname` = '" . $firstname . "', `lastname` = '" . $lastname . "', `email` = '" . $email . "', `password` = '" . hashPassword($password) . "', `company` = '" . $company . "', `address1` = '" . $address1 . "', `address2` = '" . $address2 . "', `city` = '" . $city . "', `state` = '" . $state . "', `postcode` = '" . $postcode . "', `country` = '" . $country . "', `phone` = '" . $phone . "', `notes` = '" . $notes . "', `status` = 'Active', `lastip` = '~', `lasthost` = '~', `created` = NOW()");
 		$clientid = dbInsertId();
 		$message = "Client Added: <a href=\"clientsummary.php?id=" . $clientid . "\">" . $firstname . " " . $lastname . "</a>";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		if($sendemail == "on") {
 			$rows = dbRow("SELECT * FROM `emailtemp` WHERE `emailtempid` = '1'");
 			$systemurl = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'systemurl' LIMIT 1");
@@ -210,7 +211,7 @@ switch ($task) {
 		}
 		dbExec("UPDATE `client` SET `firstname` = '" . $firstname . "', `lastname` = '" . $lastname . "', `email` = '" . $email . "'" . $setPassword . ", `company` = '" . $company . "', `address1` = '" . $address1 . "', `address2` = '" . $address2 . "', `city` = '" . $city . "', `state` = '" . $state . "', `postcode` = '" . $postcode . "', `country` = '" . $country . "', `phone` = '" . $phone . "', `notes` = '" . $notes . "', `status` = '" . $status . "' WHERE `clientid` = '" . $clientid . "'");
 		$message = "Client Edited: <a href=\"clientsummary.php?id=" . $clientid . "\">" . $firstname . " " . $lastname . "</a> (Admin)";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		if($sendemail == "on") {
 			$rows = dbRow("SELECT * FROM `emailtemp` WHERE `emailtempid` = '1'");
 			$systemurl = dbRow("SELECT `value` FROM `config` WHERE `setting` = 'systemurl' LIMIT 1");
@@ -254,6 +255,9 @@ switch ($task) {
 	case "clientlogin":
 		$clientid = sanitizeInput($_GET["id"] ?? "");
 		$return = sanitizeInput($_GET["return"] ?? "");
+		if (str_contains($return, '://') || str_starts_with($return, '//')) {
+			$return = "";
+		}
 		$numrows = dbCount("SELECT `clientid` FROM `client` WHERE `clientid` = '" . $clientid . "' LIMIT 1");
 		if($numrows == 1) {
 			$rows = dbRow("SELECT `clientid`, `email`, `firstname`, `lastname` FROM `client` WHERE `clientid` = '" . $clientid . "' LIMIT 1");
@@ -284,8 +288,8 @@ switch ($task) {
 		dbFreeResult($result);
 		$rows = dbRow("SELECT `firstname`, `lastname` FROM `client` WHERE `clientid` = '" . $clientid . "' LIMIT 1");
 		dbExec("DELETE FROM `client` WHERE `clientid` = '" . $clientid . "' LIMIT 1");
-		$message = "Client Deleted: " . $rows["firstname"] . " " . $rows["lastname"];
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "Client Deleted: " . dbEscape($rows["firstname"] . " " . $rows["lastname"]);
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Client Deleted Successfully!";
 		$_SESSION["msg2"] = "The selected client has been removed.";
 		header("Location: client.php");

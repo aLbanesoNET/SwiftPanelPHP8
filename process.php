@@ -2,6 +2,7 @@
 
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+requireSameOrigin('index.php');
 require __DIR__ . '/includes/totp.php';
 
 $task = sanitizeInput($_POST["task"] ?? $_GET["task"] ?? "");
@@ -9,6 +10,8 @@ $task = sanitizeInput($_POST["task"] ?? $_GET["task"] ?? "");
 /** Finish a successful login: set the session, remember cookie, redirect. */
 function completeClientLogin(array $user, string $return, string $remember, string $method = 'password'): void
 {
+	session_regenerate_id(true);
+	$return = safeReturnPath($return);
 	if (dbCount("SHOW TABLES LIKE 'loginlog'") > 0) {
 		dbExec(
 			"INSERT INTO `loginlog` SET `clientid` = '" . (int) $user["clientid"] . "', " .
@@ -48,7 +51,6 @@ function completeClientLogin(array $user, string $return, string $remember, stri
 switch ($task) {
 
 	case "login2fa":
-		$code   = sanitizeInput($_POST["totpcode"] ?? "");
 		$pcid   = (int) ($_SESSION["2fa_client"] ?? 0);
 		$return = (string) ($_SESSION["2fa_return"] ?? "");
 
@@ -57,6 +59,13 @@ switch ($task) {
 			exit;
 		}
 
+		if (!empty($_SESSION["lockout"]) && time() - 300 < $_SESSION["lockout"]) {
+			$_SESSION["loginerror"] = true;
+			header("Location: login.php?task=2fa");
+			exit;
+		}
+
+		$code = sanitizeInput($_POST["totpcode"] ?? "");
 		$user = dbRow("SELECT clientid,email,firstname,lastname,password,totp,totp_recovery FROM client WHERE clientid='" . $pcid . "' LIMIT 1", true);
 		if (is_array($user) && !empty($user["totp"])) {
 			if (totpVerify((string) $user["totp"], $code)) {
@@ -71,6 +80,10 @@ switch ($task) {
 
 		$_SESSION["loginerror"] = true;
 		$_SESSION["loginattempt"] = ($_SESSION["loginattempt"] ?? 0) + 1;
+		if ($_SESSION["loginattempt"] > 4) {
+			$_SESSION["lockout"] = time();
+			$_SESSION["loginattempt"] = 3;
+		}
 		header("Location: login.php?task=2fa");
 		exit;
 

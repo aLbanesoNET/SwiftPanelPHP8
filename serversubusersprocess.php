@@ -3,6 +3,7 @@ $return = true;
 
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+requireSameOrigin('index.php');
 require __DIR__ . '/includes/access.php';
 
 $clientId = (int) ($_SESSION['clientid'] ?? 0);
@@ -29,7 +30,7 @@ function su_flash(string $a, string $b, int $serverid): void
 
 if ($task === 'add') {
 	$email = strtolower(trim(sanitizeInput($_POST['email'] ?? '')));
-	if ($email === '' || !str_contains($email, '@')) {
+	if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
 		su_flash('Invalid email', 'Enter the account email of the person you want to share with.', $serverid);
 	}
 	if (dbCount("SELECT `subid` FROM `subuser` WHERE `serverid` = '" . $serverid . "' AND `subemail` = '" . dbEscape($email) . "'") > 0) {

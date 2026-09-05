@@ -8,7 +8,13 @@ $task = $task ?? '';
 		<span class="mark">&#9656;</span> <?= htmlspecialchars(SITENAME) ?>
 	</div>
 
-	<?php if (!empty($twofa)): ?>
+	<?php if (!empty($twofa) && !empty($lockout)): ?>
+		<div class="fp-note fp-note-warn">
+			<strong>Too many incorrect codes</strong>
+			<span>Please wait 5 minutes before trying again.</span>
+		</div>
+
+	<?php elseif (!empty($twofa)): ?>
 		<h1 class="fp-auth-title">Verification</h1>
 		<?php if (!empty($login_error)): ?>
 			<div class="fp-note fp-note-bad"><strong>Wrong or expired code</strong><span>Try the current 6-digit code from your app.</span></div>
@@ -49,7 +55,7 @@ $task = $task ?? '';
 			</label>
 			<label class="fp-field">
 				<span>Password</span>
-				<input type="password" name="password" autocomplete="current-password" value="<?= htmlspecialchars($password ?? '') ?>">
+				<input type="password" name="password" autocomplete="current-password" value="">
 			</label>
 
 			<label class="fp-check">

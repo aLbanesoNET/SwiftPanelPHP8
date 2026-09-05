@@ -93,10 +93,10 @@
   <?php endif; ?>
   <?php while ($rows1 = dbFetch($result1)): ?>
   <tr onmouseover="this.className='mouseover'" onmouseout="this.className=''">
-	<td>#<?= $rows1["logid"] ?></td>
+	<td>#<?= (int) $rows1["logid"] ?></td>
 	<td><?= $rows1["message"] ?></td>
-	<td><?= $rows1["name"] ?></td>
-	<td><?= $rows1["ip"] ?></td>
+	<td><?= htmlspecialchars((string) $rows1["name"], ENT_QUOTES, "UTF-8") ?></td>
+	<td><?= htmlspecialchars((string) $rows1["ip"], ENT_QUOTES, "UTF-8") ?></td>
 	<td><?= formatDate($rows1["timestamp"]) ?></td>
   </tr>
   <?php endwhile; ?>

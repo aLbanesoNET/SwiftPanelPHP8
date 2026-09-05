@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
 	$task = sanitizeInput($_GET["task"] ?? "");
@@ -102,8 +103,8 @@ switch ($task) {
 		dbExec("INSERT INTO `server` SET `clientid` = '" . $clientid . "', `name` = '" . $name . "', `game` = '" . $rows["game"] . "', `status` = 'Pending', `query` = '" . $rows["query"] . "', `qryport` = '" . $rows["qryport"] . "', `priority` = '" . $priority . "', `slots` = '" . $slots . "', `type` = '" . $type . "', `cfg1name` = '" . $rows["cfg1name"] . "', `cfg1` = '" . $cfg1 . "', `cfg1edit` = '" . $cfg1edit . "', `cfg2name` = '" . $rows["cfg2name"] . "', `cfg2` = '" . $cfg2 . "', `cfg2edit` = '" . $cfg2edit . "', `cfg3name` = '" . $rows["cfg3name"] . "', `cfg3` = '" . $cfg3 . "', `cfg3edit` = '" . $cfg3edit . "', `cfg4name` = '" . $rows["cfg4name"] . "', `cfg4` = '" . $cfg4 . "', `cfg4edit` = '" . $cfg4edit . "', `cfg5name` = '" . $rows["cfg5name"] . "', `cfg5` = '" . $cfg5 . "', `cfg5edit` = '" . $cfg5edit . "', `cfg6name` = '" . $rows["cfg6name"] . "', `cfg6` = '" . $cfg6 . "', `cfg6edit` = '" . $cfg6edit . "', `cfg7name` = '" . $rows["cfg7name"] . "', `cfg7` = '" . $cfg7 . "', `cfg7edit` = '" . $cfg7edit . "', `cfg8name` = '" . $rows["cfg8name"] . "', `cfg8` = '" . $cfg8 . "', `cfg8edit` = '" . $cfg8edit . "', `startline` = '" . $startline . "', `showftp` = '" . $showftp . "', `webftp` = '" . $webftp . "', `installdir` = '" . $rows["gamedir"] . "', `port` = '" . $rows["port"] . "', `online` = 'Pending'");
 		$serverid = dbInsertId();
 		$rows1 = dbRow("SELECT `firstname`, `lastname` FROM `client` WHERE `clientid` = '" . $clientid . "'");
-		$message = "Server Added: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a> to <a href=\"clientsummary.php?id=" . $clientid . "\">" . $rows1["firstname"] . " " . $rows1["lastname"] . "</a>";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `serverid` = '" . $serverid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "Server Added: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a> to <a href=\"clientsummary.php?id=" . $clientid . "\">" . dbEscape($rows1["firstname"] . " " . $rows1["lastname"]) . "</a>";
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $clientid . "', `serverid` = '" . $serverid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Server Added Successfully!";
 		$_SESSION["msg2"] = "The new server has been added and is ready for use.";
 		header("Location: serversummary.php?id=" . urlencode($serverid));
@@ -235,7 +236,7 @@ switch ($task) {
 		dbExec("UPDATE `server` SET `name` = '" . $name . "', `game` = '" . $game . "', `status` = '" . $status . "', `priority` = '" . $priority . "', `slots` = '" . $slots . "', `type` = '" . $type . "', `cfg1name` = '" . $cfg1name . "', `cfg1` = '" . $cfg1 . "', `cfg1edit` = '" . $cfg1edit . "', `cfg2name` = '" . $cfg2name . "', `cfg2` = '" . $cfg2 . "', `cfg2edit` = '" . $cfg2edit . "', `cfg3name` = '" . $cfg3name . "', `cfg3` = '" . $cfg3 . "', `cfg3edit` = '" . $cfg3edit . "', `cfg4name` = '" . $cfg4name . "', `cfg4` = '" . $cfg4 . "', `cfg4edit` = '" . $cfg4edit . "', `cfg5name` = '" . $cfg5name . "', `cfg5` = '" . $cfg5 . "', `cfg5edit` = '" . $cfg5edit . "', `cfg6name` = '" . $cfg6name . "', `cfg6` = '" . $cfg6 . "', `cfg6edit` = '" . $cfg6edit . "', `cfg7name` = '" . $cfg7name . "', `cfg7` = '" . $cfg7 . "', `cfg7edit` = '" . $cfg7edit . "', `cfg8name` = '" . $cfg8name . "', `cfg8` = '" . $cfg8 . "', `cfg8edit` = '" . $cfg8edit . "', `startline` = '" . $startline . "', `showftp` = '" . $showftp . "', `webftp` = '" . $webftp . "' WHERE `serverid` = '" . $serverid . "'");
 		$rows2 = dbRow("SELECT `clientid`, `boxid` FROM `server` WHERE `serverid` = '" . $serverid . "' LIMIT 1");
 		$message = "Server Edited: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a>";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows2["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows2["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows2["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows2["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Server Updated Successfully!";
 		$_SESSION["msg2"] = "Your changes to the server have been saved.";
 		header("Location: serversummary.php?id=" . urlencode($serverid));
@@ -365,7 +366,7 @@ switch ($task) {
 		dbExec("UPDATE `server` SET `ipid` = '" . $ipid . "', `port` = '" . $port . "', `query` = '" . $query . "', `qryport` = '" . $qryport . "', `user` = '" . $user . "', `password` = '" . $password . "', `homedir` = '" . $homedir . "', `installdir` = '" . $installdir . "', `online` = '" . $online . "' WHERE `serverid` = '" . $serverid . "'");
 		$rows2 = dbRow("SELECT `clientid`, `boxid` FROM `server` WHERE `serverid` = '" . $serverid . "' LIMIT 1");
 		$message = "Server Edited: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a>";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows2["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows2["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows2["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows2["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Server Updated Successfully!";
 		$_SESSION["msg2"] = "Your changes to the server have been saved.";
 		header("Location: serversummary.php?id=" . urlencode($serverid));
@@ -525,8 +526,8 @@ switch ($task) {
 		dbExec("UPDATE `server` SET `boxid` = '" . $boxid . "', `ipid` = '" . $ipid . "', `status` = 'Active', `user` = '" . $user . "', `password` = '" . $password . "', `homedir` = '" . $homedir . "', `installdir` = '" . $installdir . "', `port` = '" . $port . "', `online` = 'Stopped' WHERE `serverid` = '" . $serverid . "'");
 		$rows1 = dbRow("SELECT `clientid`, `name` FROM `server` WHERE `serverid` = '" . $serverid . "' LIMIT 1");
 		$rows2 = dbRow("SELECT `name` FROM `box` WHERE `boxid` = '" . $boxid . "' LIMIT 1");
-		$message = "Server Installed: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows1["name"] . "</a> on <a href=\"boxsummary.php?id=" . $boxid . "\">" . $rows2["name"] . "</a>";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows1["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "Server Installed: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($rows1["name"]) . "</a> on <a href=\"boxsummary.php?id=" . $boxid . "\">" . dbEscape($rows2["name"]) . "</a>";
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows1["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $boxid . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Install Wizard Successfully!";
 		if($install == "on") {
 			$_SESSION["msg2"] = "The server has been installed. Allow 5 minutes for server files to transfer before starting.";
@@ -617,8 +618,8 @@ switch ($task) {
 		@fclose($sshshell);
 		$rows2 = dbRow("SELECT `clientid`, `boxid`, `name` FROM `server` WHERE `serverid` = '" . $serverid . "' LIMIT 1");
 		$rows3 = dbRow("SELECT `name` FROM `box` WHERE `boxid` = '" . $rows2["boxid"] . "' LIMIT 1");
-		$message = "Server Rebuilt: <a href=\"serversummary.php?id=" . $serverid . "\">" . $rows2["name"] . "</a> on <a href=\"boxsummary.php?id=" . $rows2["boxid"] . "\">" . $rows3["name"] . "</a>";
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows2["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows2["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		$message = "Server Rebuilt: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($rows2["name"]) . "</a> on <a href=\"boxsummary.php?id=" . $rows2["boxid"] . "\">" . dbEscape($rows3["name"]) . "</a>";
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows2["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows2["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Rebuild Successfully!";
 		$_SESSION["msg2"] = "The server has been rebuilt. Allow 5 minutes for server files to transfer before starting.";
 		header("Location: serversummary.php?id=" . urlencode($serverid));
@@ -676,12 +677,12 @@ switch ($task) {
 		if($delete == "yes") {
 			$rows2 = dbRow("SELECT `name` FROM `box` WHERE `boxid` = '" . $rows["boxid"] . "' LIMIT 1");
 			$rows3 = dbRow("SELECT `firstname`, `lastname` FROM `client` WHERE `clientid` = '" . $rows["clientid"] . "' LIMIT 1");
-			$message = "Server Deleted: " . $rows["name"] . " on <a href=\"boxsummary.php?id=" . $rows["boxid"] . "\">" . $rows2["name"] . "</a> from <a href=\"clientsummary.php?id=" . $rows["clientid"] . "\">" . $rows3["firstname"] . " " . $rows3["lastname"] . "</a>";
+			$message = "Server Deleted: " . dbEscape($rows["name"]) . " on <a href=\"boxsummary.php?id=" . $rows["boxid"] . "\">" . dbEscape($rows2["name"]) . "</a> from <a href=\"clientsummary.php?id=" . $rows["clientid"] . "\">" . dbEscape($rows3["firstname"] . " " . $rows3["lastname"]) . "</a>";
 		} else {
 			$rows2 = dbRow("SELECT `firstname`, `lastname` FROM `client` WHERE `clientid` = '" . $rows["clientid"] . "' LIMIT 1");
-			$message = "Server Deleted: " . $rows["name"] . " from <a href=\"clientsummary.php?id=" . $rows["clientid"] . "\">" . $rows2["firstname"] . " " . $rows2["lastname"] . "</a>";
+			$message = "Server Deleted: " . dbEscape($rows["name"]) . " from <a href=\"clientsummary.php?id=" . $rows["clientid"] . "\">" . dbEscape($rows2["firstname"] . " " . $rows2["lastname"]) . "</a>";
 		}
-		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . $_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"] . "', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+		dbExec("INSERT INTO `log` SET `clientid` = '" . $rows["clientid"] . "', `serverid` = '" . $serverid . "', `boxid` = '" . $rows["boxid"] . "', `message` = '" . $message . "', `name` = '" . dbEscape($_SESSION["adminfirstname"] . " " . $_SESSION["adminlastname"]) . "', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		$_SESSION["msg1"] = "Server Deleted Successfully!";
 		$_SESSION["msg2"] = "The selected server has been removed.";
 		header("Location: clientsummary.php?id=" . urlencode($rows["clientid"]));

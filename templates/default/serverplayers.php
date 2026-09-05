@@ -26,7 +26,7 @@
 	  <td><code><?= htmlspecialchars($p['uid']) ?></code></td>
 	  <td><?= htmlspecialchars($p['time']) ?></td>
 	  <td><?= htmlspecialchars($p['ping']) ?></td>
-	  <td><a href="serverplayersprocess.php?task=kick&amp;serverid=<?= $sid ?>&amp;name=<?= urlencode($p['name']) ?>" onclick="return confirm('Kick <?= htmlspecialchars($p['name'], ENT_QUOTES) ?>?');">Kick</a></td>
+	  <td><a href="serverplayersprocess.php?task=kick&amp;serverid=<?= $sid ?>&amp;name=<?= urlencode($p['name']) ?>" onclick="return confirm('Kick <?= htmlspecialchars(addslashes($p['name']), ENT_QUOTES) ?>?');">Kick</a></td>
 	</tr>
   <?php endforeach; ?>
 </table>

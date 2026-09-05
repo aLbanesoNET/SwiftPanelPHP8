@@ -30,7 +30,7 @@
 				<span class="fp-srv-meta"><?= (int) $s['subclientid'] > 0 ? htmlspecialchars(trim(($s['firstname'] ?? '') . ' ' . ($s['lastname'] ?? '')) ?: 'linked') : '<em>pending signup</em>' ?></span>
 				<span class="fp-srv-meta"><?= htmlspecialchars(date('M j', strtotime((string) $s['created']))) ?></span>
 				<span class="fp-c-act">
-					<a class="fp-ibtn fp-ibtn-stop" href="serversubusersprocess.php?task=remove&amp;serverid=<?= $sid ?>&amp;subid=<?= (int) $s['subid'] ?>" title="Remove" onclick="return confirm('Remove access for <?= htmlspecialchars($s['subemail'], ENT_QUOTES) ?>?');">&#215;</a>
+					<a class="fp-ibtn fp-ibtn-stop" href="serversubusersprocess.php?task=remove&amp;serverid=<?= $sid ?>&amp;subid=<?= (int) $s['subid'] ?>" title="Remove" onclick="return confirm('Remove access for <?= htmlspecialchars(addslashes($s['subemail']), ENT_QUOTES) ?>?');">&#215;</a>
 				</span>
 			</div>
 		<?php endforeach; ?>

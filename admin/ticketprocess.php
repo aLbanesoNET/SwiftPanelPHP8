@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 require "../includes/notify.php";
 
 $task     = sanitizeInput($_POST["task"] ?? ($_GET["task"] ?? ""));

@@ -5,7 +5,15 @@
   </tr>
 </table>
 
-<?php if (!empty($twofa)): ?>
+<?php if (!empty($twofa) && !empty($lockout)): ?>
+<div align="center">
+  <div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;">
+	<strong>Too Many Incorrect Codes</strong><br />
+	Please wait 5 minutes before trying again.
+  </div>
+</div>
+
+<?php elseif (!empty($twofa)): ?>
 <div align="center">
   <?php if (!empty($login_error)): ?>
 	<div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;">
@@ -50,7 +58,7 @@
 	  </tr>
 	  <tr>
 		<td align="right">Password:</td>
-		<td><input type="password" name="password" class="text" size="30" value="<?= htmlspecialchars($password ?? '') ?>" /></td>
+		<td><input type="password" name="password" class="text" size="30" value="" /></td>
 	  </tr>
 	  <tr>
 		<td colspan="2" align="center">

@@ -5,6 +5,7 @@ $return = true;
 
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+requireSameOrigin('index.php');
 require __DIR__ . '/includes/console.php';
 require __DIR__ . '/includes/access.php';
 

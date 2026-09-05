@@ -5,6 +5,7 @@ if($postTask != "login" && $postTask != "login2fa" && $postTask != "password" &&
 }
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 require "../includes/totp.php";
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
@@ -12,6 +13,8 @@ if(empty($task)) {
 }
 function adminCompleteLogin(array $rows, string $return, string $rememberme): void
 {
+	session_regenerate_id(true);
+	$return = safeReturnPath($return);
 	dbExec("UPDATE `admin` SET `lastlogin` = NOW(), `lastip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "', `lasthost` = '" . dbEscape((string) @gethostbyaddr($_SERVER["REMOTE_ADDR"] ?? "")) . "' WHERE `adminid` = '" . (int) $rows["adminid"] . "'");
 	$_SESSION["adminid"] = $rows["adminid"];
 	$_SESSION["adminusername"] = $rows["username"];
@@ -29,9 +32,14 @@ function adminCompleteLogin(array $rows, string $return, string $rememberme): vo
 
 switch ($task) {
 	case "login2fa":
-		$code = sanitizeInput($_POST["totpcode"] ?? "");
-		$aid  = (int) ($_SESSION["a2fa_id"] ?? 0);
+		$aid = (int) ($_SESSION["a2fa_id"] ?? 0);
 		if ($aid <= 0) { header("Location: login.php"); exit; }
+		if (!empty($_SESSION["lockout"]) && time() - 60 * 10 < $_SESSION["lockout"]) {
+			$_SESSION["loginerror"] = TRUE;
+			header("Location: login.php?task=2fa");
+			exit;
+		}
+		$code = sanitizeInput($_POST["totpcode"] ?? "");
 		$rows = dbRow("SELECT `adminid`, `username`, `firstname`, `lastname`, `password`, `totp`, `totp_recovery` FROM `admin` WHERE `adminid` = '" . $aid . "' LIMIT 1", TRUE);
 		if ($rows && !empty($rows["totp"])) {
 			if (totpVerify((string) $rows["totp"], $code)) {
@@ -44,6 +52,11 @@ switch ($task) {
 			}
 		}
 		$_SESSION["loginerror"] = TRUE;
+		$_SESSION["loginattempt"] = ($_SESSION["loginattempt"] ?? 0) + 1;
+		if (4 < $_SESSION["loginattempt"]) {
+			$_SESSION["lockout"] = time();
+			$_SESSION["loginattempt"] = 3;
+		}
 		header("Location: login.php?task=2fa");
 		exit;
 
@@ -78,7 +91,7 @@ switch ($task) {
 			$_SESSION["lockout"] = time();
 			$_SESSION["loginattempt"] = 3;
 			$message = "5 Incorrect Admin Login Attempts (" . $username . ")";
-			dbExec("INSERT INTO `log` SET `message` = '" . $message . "', `name` = 'System Message', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+			dbExec("INSERT INTO `log` SET `message` = '" . $message . "', `name` = 'System Message', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		}
 		if(!empty($return) && !empty($username)) {
 			header("Location: login.php?return=" . urlencode($return) . "&username=" . urlencode($username));
@@ -125,7 +138,7 @@ switch ($task) {
 			$_SESSION["lockout"] = time();
 			$_SESSION["loginattempt"] = 3;
 			$message = "5 Incorrect Admin Login Attempts (" . $username . ")";
-			dbExec("INSERT INTO `log` SET `message` = '" . $message . "', `name` = 'System Message', `ip` = '" . $_SERVER["REMOTE_ADDR"] . "'");
+			dbExec("INSERT INTO `log` SET `message` = '" . $message . "', `name` = 'System Message', `ip` = '" . dbEscape($_SERVER["REMOTE_ADDR"] ?? "") . "'");
 		}
 		header("Location: login.php?task=password");
 		exit;

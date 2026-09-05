@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 include "../includes/ftp.php";
 $task = sanitizeInput($_POST["task"] ?? "");
 if(empty($task)) {
@@ -88,18 +89,19 @@ switch ($task) {
 			header("Location: serverftp.php?id=" . urlencode($serverid) . "&path=" . urlencode($path));
 			exit;
 		}
+		$uploadName = sanitizeUploadFilename((string) $_FILES["file"]["name"]);
 		$filecontents = file_get_contents($_FILES["file"]["tmp_name"]);
 		$tempHandle = fopen("php://temp", "r+");
 		fwrite($tempHandle, $filecontents);
 		rewind($tempHandle);
 		if(substr($path, 0 - 1) == "/" || empty($path)) {
-			if(!@ftp_fput($ftpconnection, $path . $_FILES["file"]["name"], $tempHandle, FTP_BINARY)) {
+			if(!@ftp_fput($ftpconnection, $path . $uploadName, $tempHandle, FTP_BINARY)) {
 				$_SESSION["msg1"] = "File Save Failed!";
 				$_SESSION["msg2"] = "The file has not been saved.";
 				header("Location: serverftp.php?id=" . urlencode($serverid) . "&path=" . urlencode($path));
 				exit;
 			}
-		} elseif(!@ftp_fput($ftpconnection, $path . "/" . $_FILES["file"]["name"], $tempHandle, FTP_BINARY)) {
+		} elseif(!@ftp_fput($ftpconnection, $path . "/" . $uploadName, $tempHandle, FTP_BINARY)) {
 			$_SESSION["msg1"] = "File Save Failed!";
 			$_SESSION["msg2"] = "The file has not been saved.";
 			header("Location: serverftp.php?id=" . urlencode($serverid) . "&path=" . urlencode($path));

@@ -5,6 +5,7 @@ $return = true;
 
 require __DIR__ . "/configuration.php";
 require __DIR__ . "/include.php";
+requireSameOrigin('index.php');
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
 	session_start();
@@ -65,7 +66,14 @@ switch ($task) {
 
 			if ($editFlag && strlen($val) > 0) {
 				$parts = preg_split('/\s+/', trim($val));
-				$final[$i] = $parts[0] ?? "";
+				$token = $parts[0] ?? "";
+				// The token is substituted straight into a shell command line when the
+				// server (re)starts (buildStartCommand()/screenStartCommand()) — block
+				// shell metacharacters ($, `, ;, |, &, quotes, braces, ...) rather than
+				// only splitting on whitespace.
+				$final[$i] = preg_match('/^[A-Za-z0-9_.\-\/]*$/', $token) === 1
+					? $token
+					: (string)($rows["cfg{$i}"] ?? "");
 			} else {
 				$final[$i] = (string)($rows["cfg{$i}"] ?? "");
 			}

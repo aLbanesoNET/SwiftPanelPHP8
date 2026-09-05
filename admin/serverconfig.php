@@ -40,10 +40,10 @@ renderTabs($tabs, 4);
 	  <div align="center">
 		<form method="post" action="serverftpprocess.php">
 		  <input type="hidden" name="task" value="filesave" />
-		  <input type="hidden" name="id" value="<?= $serverid ?>" />
-		  <input type="hidden" name="path" value="<?= $path ?>" />
-		  <input type="hidden" name="file" value="<?= $file ?>" />
-		  <textarea name="filecontents" rows="30" cols="150" class="textarea"><?= $filecontents ?></textarea>
+		  <input type="hidden" name="id" value="<?= (int) $serverid ?>" />
+		  <input type="hidden" name="path" value="<?= htmlspecialchars($path, ENT_QUOTES, "UTF-8") ?>" />
+		  <input type="hidden" name="file" value="<?= htmlspecialchars($file, ENT_QUOTES, "UTF-8") ?>" />
+		  <textarea name="filecontents" rows="30" cols="150" class="textarea"><?= htmlspecialchars($filecontents, ENT_QUOTES, "UTF-8") ?></textarea>
 		  <br />
 		  <img src="templates/<?= TEMPLATE ?>/images/spacer.gif" height="10" width="1"><br />
 		  <input type="submit" value="Save" class="button green" />

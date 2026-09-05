@@ -65,7 +65,7 @@
 	  <td><?= htmlspecialchars($x['group'] ?? '') ?></td>
 	  <td><?= htmlspecialchars($x['permsn'] ?? '') ?></td>
 	  <td>
-		<a href="#" onclick="doDeleteDir('<?= htmlspecialchars($x['name'] ?? '', ENT_QUOTES) ?>', '<?= (int)($srv['serverid'] ?? 0) ?>', '<?= htmlspecialchars($path ?? '', ENT_QUOTES) ?>');return false;">
+		<a href="#" onclick="doDeleteDir('<?= htmlspecialchars(addslashes($x['name'] ?? ''), ENT_QUOTES) ?>', '<?= (int)($srv['serverid'] ?? 0) ?>', '<?= htmlspecialchars(addslashes($path ?? ''), ENT_QUOTES) ?>');return false;">
 		  <img src="templates/<?= htmlspecialchars(TEMPLATE) ?>/images/buttons/red.png" width="25" height="25" alt="Delete" title="Delete" />
 		</a>
 	  </td>
@@ -83,7 +83,7 @@
 	  <td><?= htmlspecialchars($x['group'] ?? '') ?></td>
 	  <td><?= htmlspecialchars($x['permsn'] ?? '') ?></td>
 	  <td>
-		<a href="#" onclick="doDeleteFile('<?= htmlspecialchars($x['name'] ?? '', ENT_QUOTES) ?>', '<?= (int)($srv['serverid'] ?? 0) ?>', '<?= htmlspecialchars($path ?? '', ENT_QUOTES) ?>');return false;">
+		<a href="#" onclick="doDeleteFile('<?= htmlspecialchars(addslashes($x['name'] ?? ''), ENT_QUOTES) ?>', '<?= (int)($srv['serverid'] ?? 0) ?>', '<?= htmlspecialchars(addslashes($path ?? ''), ENT_QUOTES) ?>');return false;">
 		  <img src="templates/<?= htmlspecialchars(TEMPLATE) ?>/images/buttons/red.png" width="25" height="25" alt="Delete" title="Delete" />
 		</a>
 	  </td>

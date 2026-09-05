@@ -4,9 +4,8 @@ $page = "login";
 require "../configuration.php";
 include "./include.php";
 $task = sanitizeInput($_GET["task"] ?? "");
-$formReturn   = $_GET["return"] ?? "";
-$formUsername = $_GET["username"] ?? ($_COOKIE["adminusername"] ?? "");
-$formPassword = $_GET["password"] ?? "";
+$formReturn   = safeReturnPath($_GET["return"] ?? "");
+$formUsername = (string) ($_GET["username"] ?? ($_COOKIE["adminusername"] ?? ""));
 $rememberChecked = (($_COOKIE["rememberme"] ?? "") == "on");
 $lockout = (!empty($_SESSION["lockout"]) && time() - 60 * 10 < $_SESSION["lockout"]);
 $loginError = isset($_SESSION["loginerror"]);
@@ -24,7 +23,12 @@ if ($task === "2fa" && empty($_SESSION["a2fa_id"])) {
 }
 include "./templates/" . TEMPLATE . "/header.php";
 ?>
-<?php if ($twofa): ?>
+<?php if ($twofa && $lockout): ?>
+<div align="center">
+<div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;"><strong>Too Many Incorrect Codes</strong><br />
+	  Please wait 10 minutes before trying again.</div>
+</div>
+<?php elseif ($twofa): ?>
 <div align="center">
   <?php if ($loginError): ?>
 	<div align="center" style="width:400px;background-color:#FCF9D2;border:1px solid #F9D43E;padding:10px;"><strong>Wrong or expired code.</strong><br />Enter the current 6-digit code from your authenticator app.</div><br />
@@ -47,20 +51,20 @@ include "./templates/" . TEMPLATE . "/header.php";
 <div align="center">
   <?php if ($loginError): ?>
 	<div align="center" style="width:500px;background-color: #FCF9D2;border: 1px solid #F9D43E;padding:10px;"><strong>Login Failed. Please Try Again.</strong><br />
-	  Your IP (<?= $_SERVER["REMOTE_ADDR"] ?>) has been logged and admins notified of this failed attempt.</div>
+	  Your IP (<?= htmlspecialchars($_SERVER["REMOTE_ADDR"] ?? "", ENT_QUOTES, "UTF-8") ?>) has been logged and admins notified of this failed attempt.</div>
 	<br />
   <?php endif; ?>
   <form action="process.php" method="post">
 	<input type="hidden" name="task" value="login" />
-	<input type="hidden" name="return" value="<?= $formReturn ?>" />
+	<input type="hidden" name="return" value="<?= htmlspecialchars($formReturn, ENT_QUOTES, "UTF-8") ?>" />
 	<table border="0" cellpadding="0" cellspacing="10">
 	  <tr>
 		<td align="right">Username:</td>
-		<td><input type="text" name="username" class="text" size="30" value="<?= $formUsername ?>" /></td>
+		<td><input type="text" name="username" class="text" size="30" value="<?= htmlspecialchars($formUsername, ENT_QUOTES, "UTF-8") ?>" /></td>
 	  </tr>
 	  <tr>
 		<td align="right">Password:</td>
-		<td><input type="password" name="password" class="text" size="30" value="<?= $formPassword ?>" /></td>
+		<td><input type="password" name="password" class="text" size="30" value="" /></td>
 	  </tr>
 	  <tr>
 		<td colspan="2" align="center"><label for="rememberme"><input type="checkbox" name="rememberme" id="rememberme"<?= $rememberChecked ? ' checked="checked"' : '' ?> /> Remember my username</label></td>
@@ -81,7 +85,7 @@ include "./templates/" . TEMPLATE . "/header.php";
 	<br />
   <?php elseif ($success == "No"): ?>
 	<div align="center" style="width:500px;background-color: #FCF9D2;border: 1px solid #F9D43E;padding:10px;"><strong>Username Not Found.</strong><br />
-	  Your IP (<?= $_SERVER["REMOTE_ADDR"] ?>) has been logged and admins notified of this failed attempt.</div>
+	  Your IP (<?= htmlspecialchars($_SERVER["REMOTE_ADDR"] ?? "", ENT_QUOTES, "UTF-8") ?>) has been logged and admins notified of this failed attempt.</div>
 	<br />
   <?php endif; ?>
   <form action="process.php" method="post">

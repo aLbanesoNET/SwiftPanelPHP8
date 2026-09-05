@@ -49,7 +49,7 @@ $files   = $files ?? [];
 				<span class="fp-c-perm"><?= htmlspecialchars($x['permsn'] ?? '') ?></span>
 				<span class="fp-c-x">
 					<a class="fp-ibtn fp-ibtn-stop" href="#" title="Delete"
-					   onclick="doDeleteDir('<?= htmlspecialchars($x['name'] ?? '', ENT_QUOTES) ?>','<?= $sid ?>','<?= htmlspecialchars($path ?? '', ENT_QUOTES) ?>');return false;">&#215;</a>
+					   onclick="doDeleteDir('<?= htmlspecialchars(addslashes($x['name'] ?? ''), ENT_QUOTES) ?>','<?= $sid ?>','<?= htmlspecialchars(addslashes($path ?? ''), ENT_QUOTES) ?>');return false;">&#215;</a>
 				</span>
 			</div>
 		<?php endforeach; ?>
@@ -62,7 +62,7 @@ $files   = $files ?? [];
 				<span class="fp-c-perm"><?= htmlspecialchars($x['permsn'] ?? '') ?></span>
 				<span class="fp-c-x">
 					<a class="fp-ibtn fp-ibtn-stop" href="#" title="Delete"
-					   onclick="doDeleteFile('<?= htmlspecialchars($x['name'] ?? '', ENT_QUOTES) ?>','<?= $sid ?>','<?= htmlspecialchars($path ?? '', ENT_QUOTES) ?>');return false;">&#215;</a>
+					   onclick="doDeleteFile('<?= htmlspecialchars(addslashes($x['name'] ?? ''), ENT_QUOTES) ?>','<?= $sid ?>','<?= htmlspecialchars(addslashes($path ?? ''), ENT_QUOTES) ?>');return false;">&#215;</a>
 				</span>
 			</div>
 		<?php endforeach; ?>

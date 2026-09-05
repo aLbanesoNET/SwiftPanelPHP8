@@ -3,6 +3,7 @@ $return = true;
 
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 require "../includes/boxctl.php";
 
 header('Content-Type: application/json; charset=utf-8');

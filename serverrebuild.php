@@ -15,6 +15,7 @@ $return = true;
 
 require __DIR__ . "/configuration.php";
 require __DIR__ . "/include.php";
+requireSameOrigin('index.php');
 require __DIR__ . "/includes/boxctl.php"; // pulls includes/screenctl.php
 
 if (session_status() !== PHP_SESSION_ACTIVE) {

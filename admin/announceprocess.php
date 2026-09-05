@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 
 $task  = sanitizeInput($_POST["task"] ?? ($_GET["task"] ?? ""));
 $annid = (int) ($_POST["annid"] ?? ($_GET["annid"] ?? 0));

@@ -86,8 +86,8 @@ renderTabs($tabs, 4);
 	  <table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 		  <td align="left"><a href="serverftp.php?id=<?= $serverid ?>"><img src="templates/<?= TEMPLATE ?>/images/home_24.png" align="middle" alt="" /></a><?= buildFtpBreadcrumb($path) ?>
-		  <?php if(!empty($file)): ?> &gt; <a href='serverftp.php?id=<?= $serverid ?>&path=<?= urlencode($path) ?>&file=<?= $file ?>'><?= $file ?></a><?php endif; ?></td>
-		  <td align="right">IP: <b><?= $rows1["ip"] ?? "" ?></b>&nbsp;&nbsp;|&nbsp;&nbsp;Port: <b><?= $rows2["ftpport"] ?? "" ?></b>&nbsp;&nbsp;|&nbsp;&nbsp;User: <b><?= $rows["user"] ?></b>&nbsp;&nbsp;|&nbsp;&nbsp;Password: <b><?= $rows["password"] ?></b></td>
+		  <?php if(!empty($file)): ?> &gt; <a href='serverftp.php?id=<?= (int) $serverid ?>&path=<?= urlencode($path) ?>&file=<?= urlencode($file) ?>'><?= htmlspecialchars($file, ENT_QUOTES, "UTF-8") ?></a><?php endif; ?></td>
+		  <td align="right">IP: <b><?= htmlspecialchars((string) ($rows1["ip"] ?? ""), ENT_QUOTES, "UTF-8") ?></b>&nbsp;&nbsp;|&nbsp;&nbsp;Port: <b><?= htmlspecialchars((string) ($rows2["ftpport"] ?? ""), ENT_QUOTES, "UTF-8") ?></b>&nbsp;&nbsp;|&nbsp;&nbsp;User: <b><?= htmlspecialchars((string) $rows["user"], ENT_QUOTES, "UTF-8") ?></b>&nbsp;&nbsp;|&nbsp;&nbsp;Password: <b><?= htmlspecialchars((string) $rows["password"], ENT_QUOTES, "UTF-8") ?></b></td>
 		</tr>
 	  </table>
 	  <img src="templates/<?= TEMPLATE ?>/images/spacer.gif" width="1" height="5" alt="" /><br />
@@ -104,22 +104,22 @@ renderTabs($tabs, 4);
 		<?php foreach ($folders as $x): ?>
 		<?php $x_path = (substr($path, 0, 1) == "/") ? $path . "/" . $x["name"] : $path . $x["name"] . "/"; ?>
 		<tr onmouseover="this.className='mouseover'" onmouseout="this.className=''">
-		  <td style="text-align:left;"><img src="templates/<?= TEMPLATE ?>/images/folder_24.png" align="absmiddle" alt="" /> <a href="serverftp.php?id=<?= $serverid ?>&path=<?= urlencode($x_path) ?>"><?= $x["name"] ?></a></td>
-		  <td><?= $x["size"] ?></td>
-		  <td><?= $x["owner"] ?></td>
-		  <td><?= $x["group"] ?></td>
-		  <td><?= $x["permsn"] ?></td>
-		  <td><a href="#" onclick="doDeleteDir('<?= $x["name"] ?>', '<?= $serverid ?>', '<?= urlencode($path) ?>')"><img src="templates/<?= TEMPLATE ?>/images/status/red.png" width="25" height="25" alt="Delete"></a></td>
+		  <td style="text-align:left;"><img src="templates/<?= TEMPLATE ?>/images/folder_24.png" align="absmiddle" alt="" /> <a href="serverftp.php?id=<?= (int) $serverid ?>&path=<?= urlencode($x_path) ?>"><?= htmlspecialchars($x["name"], ENT_QUOTES, "UTF-8") ?></a></td>
+		  <td><?= htmlspecialchars((string) $x["size"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><?= htmlspecialchars((string) $x["owner"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><?= htmlspecialchars((string) $x["group"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><?= htmlspecialchars((string) $x["permsn"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><a href="#" onclick="doDeleteDir('<?= htmlspecialchars(addslashes($x["name"]), ENT_QUOTES, "UTF-8") ?>', '<?= (int) $serverid ?>', '<?= urlencode($path) ?>')"><img src="templates/<?= TEMPLATE ?>/images/status/red.png" width="25" height="25" alt="Delete"></a></td>
 		</tr>
 		<?php endforeach; ?>
 		<?php foreach ($files as $x): ?>
 		<tr onmouseover="this.className='mouseover'" onmouseout="this.className=''">
 		  <td style="text-align:left;"><img src="templates/<?= TEMPLATE ?>/images/preview_24.png" align="absmiddle" alt="" /> <?= makeFtpFileLink($x["name"]) ?></td>
-		  <td><?= $x["size"] ?></td>
-		  <td><?= $x["owner"] ?></td>
-		  <td><?= $x["group"] ?></td>
-		  <td><?= $x["permsn"] ?></td>
-		  <td><a href="#" onclick="doDeleteFile('<?= $x["name"] ?>', '<?= $serverid ?>', '<?= urlencode($path) ?>')"><img src="templates/<?= TEMPLATE ?>/images/status/red.png" width="25" height="25" alt="Delete"></a></td>
+		  <td><?= htmlspecialchars((string) $x["size"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><?= htmlspecialchars((string) $x["owner"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><?= htmlspecialchars((string) $x["group"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><?= htmlspecialchars((string) $x["permsn"], ENT_QUOTES, "UTF-8") ?></td>
+		  <td><a href="#" onclick="doDeleteFile('<?= htmlspecialchars(addslashes($x["name"]), ENT_QUOTES, "UTF-8") ?>', '<?= (int) $serverid ?>', '<?= urlencode($path) ?>')"><img src="templates/<?= TEMPLATE ?>/images/status/red.png" width="25" height="25" alt="Delete"></a></td>
 		</tr>
 		<?php endforeach; ?>
 	  </table>
@@ -130,8 +130,8 @@ renderTabs($tabs, 4);
 	  <td>
 	  <form method="post" action="serverftpprocess.php" enctype="multipart/form-data">
 		<input type="hidden" name="task" value="fileupload" />
-		<input type="hidden" name="id" value="<?= $serverid ?>" />
-		<input type="hidden" name="path" value="<?= $path ?>" />
+		<input type="hidden" name="id" value="<?= (int) $serverid ?>" />
+		<input type="hidden" name="path" value="<?= htmlspecialchars($path, ENT_QUOTES, "UTF-8") ?>" />
 	  <table cellpadding="2" cellspacing="1" class="data">
 		<tr>
 		  <th>File Upload (Max: <?= ini_get("upload_max_filesize") ?>)</th>
@@ -148,8 +148,8 @@ renderTabs($tabs, 4);
 	  <td>
 	  <form method="post" action="serverftpprocess.php">
 		<input type="hidden" name="task" value="makedir" />
-		<input type="hidden" name="id" value="<?= $serverid ?>" />
-		<input type="hidden" name="path" value="<?= $path ?>" />
+		<input type="hidden" name="id" value="<?= (int) $serverid ?>" />
+		<input type="hidden" name="path" value="<?= htmlspecialchars($path, ENT_QUOTES, "UTF-8") ?>" />
 	  <table cellpadding="2" cellspacing="1" class="data">
 		<tr>
 		  <th>Make New Directory</th>
@@ -176,10 +176,10 @@ renderTabs($tabs, 4);
 	  <div align="center">
 	  <form method="post" action="serverftpprocess.php">
 		  <input type="hidden" name="task" value="filesave" />
-		  <input type="hidden" name="id" value="<?= $serverid ?>" />
-		  <input type="hidden" name="path" value="<?= $path ?>" />
-		  <input type="hidden" name="file" value="<?= $file ?>" />
-		  <textarea name="filecontents" rows="30" cols="150" class="textarea"><?= $filecontents ?></textarea>
+		  <input type="hidden" name="id" value="<?= (int) $serverid ?>" />
+		  <input type="hidden" name="path" value="<?= htmlspecialchars($path, ENT_QUOTES, "UTF-8") ?>" />
+		  <input type="hidden" name="file" value="<?= htmlspecialchars($file, ENT_QUOTES, "UTF-8") ?>" />
+		  <textarea name="filecontents" rows="30" cols="150" class="textarea"><?= htmlspecialchars($filecontents, ENT_QUOTES, "UTF-8") ?></textarea>
 		  <br /><img src="templates/<?= TEMPLATE ?>/images/spacer.gif" height="10" width="1"><br />
 		  <input type="submit" value="Save" class="button green" />
 	  </form>

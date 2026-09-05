@@ -2,6 +2,7 @@
 $return = true;
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+requireSameOrigin('index.php');
 require __DIR__ . '/includes/ftp.php';
 
 $task = sanitizeInput($_POST["task"] ?? "");
@@ -117,7 +118,7 @@ switch ($task) {
 		}
 
 		$tmp = (string)($_FILES["file"]["tmp_name"] ?? "");
-		$name = (string)($_FILES["file"]["name"] ?? "");
+		$name = sanitizeUploadFilename((string)($_FILES["file"]["name"] ?? ""));
 		if ($tmp === "" || $name === "") {
 			failFtp($serverid, $path, "File Save Failed!", "The file has not been saved.");
 		}

@@ -3,8 +3,11 @@
 error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
+require_once __DIR__ . "/../includes/security.php";
+
 session_name("PHPSESSION");
 session_cache_expire(30);
+hardenSessionCookieParams();
 session_start();
 
 $page   = $page   ?? '';
@@ -15,7 +18,7 @@ if(empty($_SESSION["adminid"]) && !empty($return)) {
 		header("Location: login.php");
 		exit;
 	}
-	header("Location: login.php?return=" . $return);
+	header("Location: login.php?return=" . urlencode((string) $return));
 	exit;
 }
 if($page == "index" && @chdir("../install")) {

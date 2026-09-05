@@ -3,6 +3,7 @@ $return = true;
 
 require __DIR__ . '/configuration.php';
 require __DIR__ . '/include.php';
+requireSameOrigin('index.php');
 require __DIR__ . '/includes/totp.php';
 
 $task = sanitizeInput($_POST["task"] ?? $_GET["task"] ?? "");
@@ -138,12 +139,15 @@ if ($password === "") {
 
 $message = "Client Edited: <a href=\"clientsummary.php?id=$clientid\">$firstname $lastname</a>";
 
+$logName = dbEscape(($_SESSION["clientfirstname"] ?? "") . " " . ($_SESSION["clientlastname"] ?? ""));
+$logIp   = dbEscape($_SERVER["REMOTE_ADDR"] ?? "");
+
 dbExec(
-	"INSERT INTO log 
+	"INSERT INTO log
 	 SET clientid='$clientid',
 		 message='$message',
-		 name='{$_SESSION["clientfirstname"]} {$_SESSION["clientlastname"]}',
-		 ip='{$_SERVER["REMOTE_ADDR"]}'"
+		 name='$logName',
+		 ip='$logIp'"
 );
 
 $_SESSION["msg1"] = "Profile Updated Successfully!";

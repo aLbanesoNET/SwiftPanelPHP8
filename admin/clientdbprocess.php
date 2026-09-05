@@ -2,6 +2,7 @@
 $return = TRUE;
 require "../configuration.php";
 require "./include.php";
+requireSameOrigin('index.php');
 require "../includes/dbctl.php";
 
 $task  = sanitizeInput($_POST["task"] ?? ($_GET["task"] ?? ""));

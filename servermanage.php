@@ -5,6 +5,7 @@ $return = true;
 
 require __DIR__ . "/configuration.php";
 require __DIR__ . "/include.php";
+requireSameOrigin('index.php');
 require __DIR__ . "/includes/screenctl.php";
 require __DIR__ . "/includes/access.php";
 
@@ -111,7 +112,7 @@ switch ($task) {
 			$clientLast  = $_SESSION["clientlastname"] ?? "";
 			$ip		  = $_SERVER["REMOTE_ADDR"] ?? "";
 
-			$message = "Server Stopped: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a> (Client)";
+			$message = "Server Stopped: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($name) . "</a> (Client)";
 
 			dbExec(
 				"INSERT INTO `log` SET
@@ -119,8 +120,8 @@ switch ($task) {
 					`serverid` = '" . $serverid . "',
 					`boxid`	= '" . ($rows["boxid"] ?? "") . "',
 					`message`  = '" . $message . "',
-					`name`	 = '" . trim($clientFirst . " " . $clientLast) . "',
-					`ip`	   = '" . $ip . "'"
+					`name`	 = '" . dbEscape(trim($clientFirst . " " . $clientLast)) . "',
+					`ip`	   = '" . dbEscape($ip) . "'"
 			);
 
 			$_SESSION["msg1"] = "Server Stopped Successfully!";
@@ -216,11 +217,11 @@ switch ($task) {
 		$ip		  = $_SERVER["REMOTE_ADDR"] ?? "";
 
 		if ($task === "start") {
-			$message = "Server Started: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a> (Client)";
+			$message = "Server Started: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($name) . "</a> (Client)";
 			$_SESSION["msg1"] = "Server Started Successfully!";
 			$_SESSION["msg2"] = "Allow 20 seconds for server status to show!";
 		} else { // restart
-			$message = "Server Restarted: <a href=\"serversummary.php?id=" . $serverid . "\">" . $name . "</a> (Client)";
+			$message = "Server Restarted: <a href=\"serversummary.php?id=" . $serverid . "\">" . dbEscape($name) . "</a> (Client)";
 			$_SESSION["msg1"] = "Server Restarted Successfully!";
 			$_SESSION["msg2"] = "Allow 20 seconds for server status to show!";
 		}
@@ -231,8 +232,8 @@ switch ($task) {
 				`serverid` = '" . $serverid . "',
 				`boxid`	= '" . ($rows["boxid"] ?? "") . "',
 				`message`  = '" . $message . "',
-				`name`	 = '" . trim($clientFirst . " " . $clientLast) . "',
-				`ip`	   = '" . $ip . "'"
+				`name`	 = '" . dbEscape(trim($clientFirst . " " . $clientLast)) . "',
+				`ip`	   = '" . dbEscape($ip) . "'"
 		);
 
 		header("Location: " . (!empty($returnTo) ? $returnTo : "serversummary.php?id=" . urlencode($serverid)));

@@ -7,17 +7,17 @@ require "../configuration.php";
 require "./include.php";
 $linkend = "";
 $dirImage = "";
-$orderby = sanitizeInput($_GET["orderby"] ?? "");
-if(empty($orderby)) {
-	$orderby = "clientid";
-}
+$orderby = sqlSortColumn(sanitizeInput($_GET["orderby"] ?? ""), ["clientid", "firstname", "lastname", "email", "lastlogin"], "clientid");
 $dir = sanitizeInput($_GET["dir"] ?? "");
 if(empty($dir)) {
 	$dirImage = " <img src='templates/" . TEMPLATE . "/images/asc.png' align='bottom' alt='' />";
-} elseif($dir = "desc") {
+} elseif($dir === "desc") {
 	$dirImage = " <img src='templates/" . TEMPLATE . "/images/desc.png' align='bottom' alt='' />";
 }
 $search = sanitizeInput($_GET["search"] ?? "");
+if ($search !== "" && !in_array($search, ["clientid", "firstname", "lastname", "email", "lastip", "lasthost"], true)) {
+	$search = "firstname";
+}
 $q = sanitizeInput($_GET["q"] ?? "");
 if(!empty($q)) {
 	$linkend .= "&amp;search=" . $search . "&amp;q=" . $q;
@@ -60,7 +60,7 @@ if(!empty($status)) {
 }
 $query .= "ORDER BY `" . $orderby . "` ";
 if(!empty($dir)) {
-	$query .= $dir . " ";
+	$query .= sqlSortDir($dir) . " ";
 }
 $numrecords = dbCount($query);
 $numpages = ceil($numrecords / $rowsperpage);
