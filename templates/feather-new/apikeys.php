@@ -7,7 +7,8 @@
 <section class="fp-hero">
 	<div class="fp-hero-text">
 		<h1>API keys</h1>
-		<p>Use a bearer token to control your servers from scripts. Base URL <code><?= htmlspecialchars((($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/'))) ?>/api.php</code></p>
+		<p>Use a bearer token to control your servers from scripts. Base URL <code><?= htmlspecialchars((($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/'))) ?>/api.php</code>
+		&mdash; <a href="api-test.php">try it out &rsaquo;</a></p>
 	</div>
 </section>
 

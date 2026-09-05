@@ -99,18 +99,21 @@ select.select {
 	position: absolute;
 	top: 0px;
 	right: 50%;
-	height: 60px;
+	height: 82px;
 	background: url(images/swiftpanel.png) no-repeat 12px center;
 	z-index:2;
 }
 #nav #home {
 	position: absolute;
-	top: 14px;
+	top: 10px;
 	left: 230px;
+	right: 14px;
 	font-size: 28px;
 	color: #FFFFFF;
 	font-weight: bold;
-	width: 520px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 #nav #left {
 	position: absolute;
@@ -133,7 +136,7 @@ select.select {
 	width: 940px;
 	margin-right: -470px;
 	position: absolute;
-	top: 67px;
+	top: 89px;
 	right: 50%;
 	text-align: left;
 	z-index: 1;

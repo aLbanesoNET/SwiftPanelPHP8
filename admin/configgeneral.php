@@ -58,8 +58,6 @@ echo renderMessageBox();
 	  <td id="tabs1" class="tabsactive" onclick="toggleTab(1)">General</td>
 	  <td width="2" class="tabspacer"><img src="templates/<?= TEMPLATE ?>/images/spacer.gif" width="2" height="1" alt="" /></td>
 	  <td id="tabs2" class="tabs" onclick="toggleTab(2)">Localize</td>
-	  <td width="2" class="tabspacer"><img src="templates/<?= TEMPLATE ?>/images/spacer.gif" width="2" height="1" alt="" /></td>
-	  <td id="tabs3" class="tabs" onclick="toggleTab(3)">Support</td>
 	  <td width="100%" class="tabspacer">&nbsp;</td>
 	</tr>
 	<tr id="tab1">
@@ -134,19 +132,12 @@ echo renderMessageBox();
 		  </table>
 		</fieldset></td>
 	</tr>
-	<tr id="tab3" style="display:none;">
-	  <td class="tab" colspan="7"><fieldset><table width="100%" border="0" cellpadding="2" cellspacing="2">
-		<tr><td colspan="2" class="fieldheader">Support Tickets</td></tr>
-		<tr><td class="fieldarea">Clients open tickets from <b>Support</b> in their area; staff answer them under
-		  <a href="tickets.php">Utilities &rsaquo; Support Tickets</a>. No configuration needed.</td></tr>
-	  </table></fieldset></td>
-	</tr>
   </table>
   <img src="templates/<?= TEMPLATE ?>/images/spacer.gif" height="10" width="1" alt="" /><br />
   <div align="center">
 	<input type="submit" value="Save Changes" class="button green" />
   </div>
 </form>
-<script language="javascript" type="text/javascript">var numtabs = 3;</script>
+<script language="javascript" type="text/javascript">var numtabs = 2;</script>
 <?php
 include "./templates/" . TEMPLATE . "/footer.php";

@@ -57,6 +57,7 @@ renderForm($form);
 		<input type="submit" value="Disable 2FA" class="button red" />
 	  </form></td></tr>
 	<?php else: ?>
+	<tr><td class="fieldname" style="width:140px;">Scan to Enable</td><td class="fieldarea"><div id="totp-qr" style="width:180px;height:180px;"></div></td></tr>
 	<tr><td class="fieldname" style="width:140px;">Setup Key</td><td class="fieldarea"><code><?= htmlspecialchars(trim(chunk_split($totpSetup, 4, " "))) ?></code></td></tr>
 	<tr><td class="fieldname">otpauth URI</td><td class="fieldarea"><code style="word-break:break-all;"><?= htmlspecialchars($totpUri) ?></code></td></tr>
 	<tr><td colspan="2" class="fieldarea">
@@ -65,6 +66,19 @@ renderForm($form);
 		Add the key to your app, then enter a code: <input type="text" name="totpcode" class="text" size="8" maxlength="6" />
 		<input type="submit" value="Enable 2FA" class="button green" />
 	  </form></td></tr>
+	<script src="javascript/qrcode.js"></script>
+	<script>
+	(function () {
+		var el = document.getElementById('totp-qr');
+		if (!el || typeof qrcode === 'undefined') { return; }
+		var qr = qrcode(0, 'M');
+		qr.addData(<?= json_encode($totpUri, JSON_HEX_TAG | JSON_HEX_AMP) ?>);
+		qr.make();
+		el.innerHTML = qr.createSvgTag({cellSize: 5, margin: 4, scalable: true});
+		var svg = el.querySelector('svg');
+		if (svg) { svg.style.width = '100%'; svg.style.height = '100%'; svg.style.display = 'block'; }
+	})();
+	</script>
 	<?php endif; ?>
   </table>
 </fieldset>

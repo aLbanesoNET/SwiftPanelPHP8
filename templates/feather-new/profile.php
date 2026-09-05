@@ -72,6 +72,7 @@
 		</form>
 	<?php else: ?>
 		<p>Add your authenticator app (Google Authenticator, Aegis, 1Password&hellip;), then enter a code to turn it on.</p>
+		<div id="totp-qr" style="width:180px;height:180px;margin-bottom:12px;"></div>
 		<dl class="fp-dl">
 			<dt>Setup key</dt><dd><code><?= htmlspecialchars(trim(chunk_split($totpSetup, 4, ' '))) ?></code></dd>
 			<dt>otpauth URI</dt><dd><code style="word-break:break-all;"><?= htmlspecialchars($totpUri) ?></code></dd>
@@ -81,6 +82,19 @@
 			<label class="fp-field"><span>Code from your app</span><input type="text" name="totpcode" inputmode="numeric" maxlength="6"></label>
 			<div class="fp-form-actions"><button type="submit" class="fp-btn">Enable 2FA</button></div>
 		</form>
+		<script src="javascript/qrcode.js"></script>
+		<script>
+		(function () {
+			var el = document.getElementById('totp-qr');
+			if (!el || typeof qrcode === 'undefined') { return; }
+			var qr = qrcode(0, 'M');
+			qr.addData(<?= json_encode($totpUri, JSON_HEX_TAG | JSON_HEX_AMP) ?>);
+			qr.make();
+			el.innerHTML = qr.createSvgTag({cellSize: 5, margin: 4, scalable: true});
+			var svg = el.querySelector('svg');
+			if (svg) { svg.style.width = '100%'; svg.style.height = '100%'; svg.style.display = 'block'; }
+		})();
+		</script>
 	<?php endif; ?>
 </div>
 

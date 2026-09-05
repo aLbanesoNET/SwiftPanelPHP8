@@ -48,11 +48,14 @@ function isSameOriginRequest(): bool
 		return $refHost !== null && strcasecmp($refHost, explode(':', $host)[0]) === 0;
 	}
 
-	// Neither header present. Real browsers always send at least a Referer on
-	// same-site form posts/link clicks; a bare cross-site CSRF PoC (<img>,
-	// fetch with no-referrer, etc.) commonly strips both. Treat as a mismatch
-	// for state-changing requests rather than fail open.
-	return false;
+	// Neither header present. This also happens on legitimate same-site
+	// clicks — privacy-focused browsers/extensions (Brave, strict ad/tracker
+	// blockers, "no-referrer" settings) routinely strip both. A same-site
+	// cross-tab/cross-site attacker request normally still carries a Referer
+	// pointing at the attacker's own page, which the checks above already
+	// catch as a mismatch; failing open here only stops blocking real users,
+	// it doesn't hand back the CSRF hole those checks close.
+	return true;
 }
 
 /**

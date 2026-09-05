@@ -9,7 +9,8 @@
 <?php endif; ?>
 
 <p>Control your servers from scripts with an <code>Authorization: Bearer &lt;token&gt;</code> header.
-Base URL: <code><?= htmlspecialchars((($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/'))) ?>/api.php</code></p>
+Base URL: <code><?= htmlspecialchars((($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? '') . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/'))) ?>/api.php</code>
+&mdash; <a href="api-test.php">try it out &rsaquo;</a></p>
 
 <?php if (!empty($newToken)): ?>
   <fieldset><table width="100%" border="0" cellpadding="2" cellspacing="2">
