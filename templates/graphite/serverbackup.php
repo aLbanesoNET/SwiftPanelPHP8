@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-serverbackup" data-view="serverbackup">
 <?php
 $sid = (int) ($srv['serverid'] ?? 0);
 $backups = $backups ?? [];
@@ -52,3 +53,5 @@ $backups = $backups ?? [];
 <?php else: ?>
 	<div class="graphite-empty" style="margin-top:20px;">Backup limit reached &mdash; delete one to make another.</div>
 <?php endif; ?>
+
+</section>

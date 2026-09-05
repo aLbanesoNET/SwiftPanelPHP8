@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-serversummary" data-view="serversummary">
 <?php
 // expects: $srv (array), $query (array|null), $e_msg1, $e_msg2, $isOwner
 $srv     = $srv ?? [];
@@ -228,3 +229,5 @@ if ($cInstalled):
 })();
 </script>
 <?php endif; ?>
+
+</section>

@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-serverschedule" data-view="serverschedule">
 <?php
 $sid = (int) ($srv['serverid'] ?? 0);
 $schedules = $schedules ?? [];
@@ -78,3 +79,5 @@ $schedules = $schedules ?? [];
 	</div>
 	<div class="graphite-form-actions"><button type="submit" class="graphite-btn">Add schedule</button></div>
 </form>
+
+</section>

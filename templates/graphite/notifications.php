@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-notifications" data-view="notifications">
 <?php $notifs = $notifs ?? []; ?>
 <section class="graphite-hero">
 	<div class="graphite-hero-text">
@@ -34,3 +35,5 @@
 		<?php endforeach; ?>
 	</div>
 <?php endif; ?>
+
+</section>

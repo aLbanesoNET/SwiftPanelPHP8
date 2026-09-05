@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-dashboard" data-view="dashboard">
 <?php
 $openTickets = dbCount("SHOW TABLES LIKE 'ticket'") > 0 ? dbCount("SELECT `ticketid` FROM `ticket` WHERE `status` != 'closed'") : 0;
 $dbCount     = dbCount("SHOW TABLES LIKE 'clientdatabase'") > 0 ? dbCount("SELECT `dbid` FROM `clientdatabase`") : 0;
@@ -60,3 +61,5 @@ $cards = [
 		</form>
 	</div>
 </div>
+
+</section>

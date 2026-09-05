@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-server" data-view="server">
 <?php
 // expects: $servers[] (serverid,name,game,status,online,ip,port,servername?,map?,players?)
 $servers = $servers ?? [];
@@ -74,3 +75,5 @@ $flash2  = $FLASH_MSG2 ?? ($msg2 ?? ($e_msg2 ?? null));
 		<?php endforeach; ?>
 	</div>
 <?php endif; ?>
+
+</section>

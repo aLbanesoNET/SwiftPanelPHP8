@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-login" data-view="login">
 <?php
 // expects: $lockout, $task, $login_error, $success, $return, $email, $password, $remember_me
 $task = $task ?? '';
@@ -89,3 +90,5 @@ $task = $task ?? '';
 		<a class="graphite-auth-link" href="login.php">Back to sign in</a>
 	<?php endif; ?>
 </div>
+
+</section>

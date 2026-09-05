@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-clientdatabases" data-view="clientdatabases">
 <?php
 // expects: $databases[], $cfg, $canCreate, $msg1, $msg2
 $cid = (int) ($_SESSION['clientid'] ?? 0);
@@ -94,3 +95,5 @@ function fpReveal(btn){
 	else { c.textContent = c.dataset.secret; btn.textContent = 'hide'; btn.dataset.on = '1'; }
 }
 </script>
+
+</section>

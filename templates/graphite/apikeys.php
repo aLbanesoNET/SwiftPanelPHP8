@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-apikeys" data-view="apikeys">
 <?php $keys = $keys ?? []; ?>
 <?php if (!empty($msg1)): ?>
 	<div class="graphite-note graphite-note-ok"><strong><?= htmlspecialchars($msg1) ?></strong><span><?= htmlspecialchars($msg2 ?? '') ?></span></div>
@@ -50,3 +51,5 @@
 	<label class="graphite-check" style="margin-top:10px;"><input type="checkbox" name="readonly" value="1" checked> Read-only (no power actions)</label>
 	<div class="graphite-form-actions"><button type="submit" class="graphite-btn">Create key</button></div>
 </form>
+
+</section>

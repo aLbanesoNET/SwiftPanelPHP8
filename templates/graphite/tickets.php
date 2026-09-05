@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-tickets" data-view="tickets">
 <?php $tickets = $tickets ?? []; ?>
 <?php if (!empty($msg1)): ?>
 	<div class="graphite-note graphite-note-ok"><strong><?= htmlspecialchars($msg1) ?></strong><span><?= htmlspecialchars($msg2 ?? '') ?></span></div>
@@ -47,3 +48,5 @@
 	<label class="graphite-field" style="margin-top:12px;"><span>Message</span><textarea name="body" rows="6"></textarea></label>
 	<div class="graphite-form-actions"><button type="submit" class="graphite-btn">Open ticket</button></div>
 </form>
+
+</section>

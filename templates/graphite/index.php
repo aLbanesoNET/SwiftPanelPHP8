@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-index" data-view="index">
 <?php
 // expects: $client (first_name,last_name,email,servers), $servers[], $FLASH_MSG1/2
 $servers = $servers ?? [];
@@ -98,3 +99,5 @@ foreach ($servers as $s) {
 		<?php endforeach; ?>
 	</div>
 <?php endif; ?>
+
+</section>

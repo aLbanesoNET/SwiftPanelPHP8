@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-serverplayers" data-view="serverplayers">
 <?php $sid = (int) ($srv['serverid'] ?? 0); $players = $players ?? []; ?>
 <?php if (!empty($msg1)): ?>
 	<div class="graphite-note graphite-note-ok"><strong><?= htmlspecialchars($msg1) ?></strong><span><?= htmlspecialchars($msg2 ?? '') ?></span></div>
@@ -39,3 +40,5 @@
 		<?php endforeach; ?>
 	</div>
 <?php endif; ?>
+
+</section>

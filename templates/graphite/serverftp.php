@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-serverftp" data-view="serverftp">
 <?php
 // expects: $srv, $e_msg1, $e_msg2, $bread_crumb, $file, $path, $path_decoded,
 //          $folders[], $files[], $max_filesize, $file_contents
@@ -117,3 +118,5 @@ $files   = $files ?? [];
 	</form>
 
 <?php endif; ?>
+
+</section>

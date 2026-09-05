@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-serversubusers" data-view="serversubusers">
 <?php $sid = (int) ($srv['serverid'] ?? 0); $subs = $subs ?? []; ?>
 <?php if (!empty($msg1)): ?>
 	<div class="graphite-note graphite-note-ok"><strong><?= htmlspecialchars($msg1) ?></strong><span><?= htmlspecialchars($msg2 ?? '') ?></span></div>
@@ -44,3 +45,5 @@
 	<label class="graphite-field"><span>Their account email</span><input type="text" name="email" placeholder="friend@example.com"></label>
 	<div class="graphite-form-actions"><button type="submit" class="graphite-btn">Share</button></div>
 </form>
+
+</section>

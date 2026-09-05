@@ -1,4 +1,5 @@
 <?php if (!defined('SITENAME')) { http_response_code(403); exit('Forbidden'); } ?>
+<section class="graphite-view graphite-view-profile" data-view="profile">
 <?php
 // expects: $msg1, $msg2, $firstname, $lastname, $email
 ?>
@@ -109,3 +110,5 @@
 		</dl>
 	</div>
 <?php endif; ?>
+
+</section>
